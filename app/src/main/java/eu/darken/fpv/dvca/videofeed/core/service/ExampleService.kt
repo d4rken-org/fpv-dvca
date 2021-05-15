@@ -1,4 +1,4 @@
-package eu.darken.fpv.dvca.main.core.service
+package eu.darken.fpv.dvca.videofeed.core.service
 
 import android.content.Intent
 import android.os.IBinder
