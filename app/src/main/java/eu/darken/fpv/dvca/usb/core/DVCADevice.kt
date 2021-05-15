@@ -11,5 +11,5 @@ data class DVCADevice(
         get() = raw.deviceName
 
     val label: String
-        get() = "${raw.manufacturerName} \"${raw.productName}\" ${raw.version} (${raw.deviceName})"
+        get() = "${raw.manufacturerName} \"${raw.productName}\" (${raw.deviceName})"
 }
