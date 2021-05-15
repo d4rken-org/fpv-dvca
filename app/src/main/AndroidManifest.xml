@@ -2,17 +2,21 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="eu.darken.fpv.dvca">
 
+    <uses-feature
+        android:name="android.hardware.usb.host"
+        android:required="true"/>
+
     <application
+        android:name="eu.darken.fpv.dvca.App"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
-        android:name="eu.darken.fpv.dvca.App"
-        android:label="@string/app_name"
+        android:label="@string/app_name_short"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/BaseAppTheme">
         <activity
             android:name="eu.darken.fpv.dvca.main.ui.MainActivity"
-            android:label="@string/app_name"
+            android:label="@string/app_name_short"
             android:theme="@style/Theme.LauncherToMainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -20,15 +24,19 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <receiver
-            android:name="eu.darken.fpv.dvca.main.core.receiver.ExampleReceiver"
-            android:enabled="true"
-            android:label="@string/app_name">
-            <intent-filter>
-                <action android:name="android.intent.action.HEADSET_PLUG" />
+        <service android:name="eu.darken.fpv.dvca.videofeed.core.service.ExampleService" />
+
+        <receiver android:name=".usb.core.UsbDeviceEventReceiver">
+            <intent-filter >
+                <action android:name="android.hardware.usb.action.USB_STATE"/>
+                <action android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED"/>
+                <action android:name="android.hardware.usb.action.USB_DEVICE_DETACHED"/>
             </intent-filter>
+            <meta-data android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED"
+                android:resource="@xml/usb_device_filter"/>
+            <meta-data android:name="android.hardware.usb.action.USB_DEVICE_DETACHED"
+                android:resource="@xml/usb_device_filter"/>
         </receiver>
-        <service android:name="eu.darken.fpv.dvca.main.core.service.ExampleService" />
     </application>
 
 </manifest>

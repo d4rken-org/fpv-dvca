@@ -49,7 +49,6 @@ class HotDataFlow<T : Any>(
                 send(State(value = it, updatedBy = initializer))
             }
         }
-        Timber.tag(tag).v("startValue=%s", currentValue)
 
         updateActions
             .onCompletion {

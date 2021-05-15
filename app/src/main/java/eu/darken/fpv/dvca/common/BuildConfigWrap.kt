@@ -7,6 +7,8 @@ import eu.darken.fpv.dvca.BuildConfig
 @Suppress("MayBeConstant")
 object BuildConfigWrap {
 
+    val APPLICATION_ID: String = BuildConfig.APPLICATION_ID
+
     val DEBUG: Boolean = BuildConfig.DEBUG
     val BUILD_TYPE: String = BuildConfig.BUILD_TYPE
 

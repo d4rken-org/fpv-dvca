@@ -26,10 +26,10 @@ open class App : Application() {
     }
 
     companion object {
-        internal val TAG = logTag("DVCA")
+        private const val TAG = "DVCA"
 
         fun logTag(vararg tags: String): String {
-            val sb = StringBuilder()
+            val sb = StringBuilder("$TAG:")
             for (i in tags.indices) {
                 sb.append(tags[i])
                 if (i < tags.size - 1) sb.append(":")

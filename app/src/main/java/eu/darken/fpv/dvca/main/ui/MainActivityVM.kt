@@ -2,12 +2,10 @@ package eu.darken.fpv.dvca.main.ui
 
 import androidx.lifecycle.SavedStateHandle
 import dagger.hilt.android.lifecycle.HiltViewModel
+import eu.darken.fpv.dvca.common.livedata.SingleLiveEvent
 import eu.darken.fpv.dvca.common.coroutine.DispatcherProvider
 import eu.darken.fpv.dvca.common.viewmodel.SmartVM
-import eu.darken.fpv.dvca.main.core.SomeRepo
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.onEach
-import timber.log.Timber
+import eu.darken.fpv.dvca.onboarding.core.OnboardingSettings
 import javax.inject.Inject
 
 
@@ -15,27 +13,16 @@ import javax.inject.Inject
 class MainActivityVM @Inject constructor(
     dispatcherProvider: DispatcherProvider,
     handle: SavedStateHandle,
-    private val someRepo: SomeRepo
+    private val onboardingSettings: OnboardingSettings,
 ) : SmartVM(dispatcherProvider = dispatcherProvider) {
 
-    private val stateFlow = MutableStateFlow(State())
-    val state = stateFlow
-        .onEach { Timber.v("New state: %s", it) }
-        .asLiveData2()
+    val navStartEvent = SingleLiveEvent<NavInit>()
 
     init {
-        Timber.d("ViewModel: %s", this)
-        Timber.d("SavedStateHandle: %s", handle.keys())
-        Timber.d("Persisted value: %s", handle.get<String>("key"))
-        handle.set("key", "valueActivity")
+        navStartEvent.postValue(NavInit(showOnboarding = !onboardingSettings.isOnboarded.value))
     }
 
-    fun onGo() {
-        stateFlow.value = stateFlow.value.copy(ready = true)
-    }
-
-    data class State(
-        val ready: Boolean = false
+    data class NavInit(
+        val showOnboarding: Boolean
     )
-
 }

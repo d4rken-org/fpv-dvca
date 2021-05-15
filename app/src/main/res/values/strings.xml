@@ -1,9 +1,15 @@
 <resources>
-    <string name="app_name">DVCA</string>
+    <string name="app_name_short">DVCA</string>
     <string name="label_settings">Settings</string>
     <string name="label_help">Help</string>
     <string name="label_example_fragment">Example Fragment</string>
     <string name="label_another_fragment">Another Fragment</string>
     <string name="action_show_another_fragment">Show another fragment</string>
     <string name="msg_what_up_this_is_another_fragment">What up! This is another fragment!</string>
+    <string name="onboarding_description_what"><![CDATA[This is a companion app for the DJI FPV Googles V1 & V2, allowing video access via USB-C.]]></string>
+    <string name="onboarding_what_not_description">This is not an official app. It is not endorsed by DJI. It\'s community project. From FPV pilots for FPV pilots.</string>
+    <string name="onboarding_risk_description">Use this app at your own risk! Functionality is based on undocoumented behavior.</string>
+    <string name="onboarding_flysafe_description">Fly safe and have a good time!</string>
+    <string name="action_start">Start</string>
+    <string name="app_name_long">Digital Video Companion App</string>
 </resources>

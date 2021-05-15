@@ -1,10 +1,8 @@
 package eu.darken.fpv.dvca.main.ui
 
 import android.os.Bundle
-import android.view.Menu
 import android.view.MenuItem
 import androidx.activity.viewModels
-import androidx.core.os.bundleOf
 import androidx.navigation.findNavController
 import androidx.navigation.ui.NavigationUI
 import androidx.navigation.ui.setupActionBarWithNavController
@@ -25,33 +23,21 @@ class MainActivity : SmartActivity() {
 
         setContentView(R.layout.main_activity)
 
-        vm.state.observe(this) {
-            if (it.ready && !navController.isGraphSet()) {
-                val graph = navController.navInflater.inflate(R.navigation.main)
+        vm.navStartEvent.observe(this) { navInit ->
+            if (navController.isGraphSet()) return@observe
 
-                navController.setGraph(graph, bundleOf("exampleArgument" to "hello"))
-                setupActionBarWithNavController(navController)
+            val graph = navController.navInflater.inflate(R.navigation.main).apply {
+                startDestination = when (navInit.showOnboarding) {
+                    true -> R.id.onboardingFragment
+                    false -> R.id.videoFeedFragment
+                }
             }
+            navController.graph = graph
         }
-
-
-        vm.onGo()
     }
 
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        menuInflater.inflate(R.menu.menu_main, menu)
-        return true
-    }
+    override fun onSupportNavigateUp(): Boolean = navController.navigateUp() || super.onSupportNavigateUp()
 
-    override fun onSupportNavigateUp(): Boolean {
-        return navController.navigateUp() || super.onSupportNavigateUp()
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean = when (item.itemId) {
-        R.id.action_settings -> {
-            // NOOP
-            true
-        }
-        else -> NavigationUI.onNavDestinationSelected(item, navController) || super.onOptionsItemSelected(item)
-    }
+    override fun onOptionsItemSelected(item: MenuItem): Boolean =
+        NavigationUI.onNavDestinationSelected(item, navController) || super.onOptionsItemSelected(item)
 }
