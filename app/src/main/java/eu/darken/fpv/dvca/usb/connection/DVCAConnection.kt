@@ -5,12 +5,11 @@ import android.hardware.usb.UsbDeviceConnection
 import android.hardware.usb.UsbEndpoint
 import android.hardware.usb.UsbInterface
 import eu.darken.fpv.dvca.App
-import eu.darken.fpv.dvca.usb.connection.io.AndroidUSBInputStream2
 import eu.darken.fpv.dvca.usb.connection.io.UsbDataSink
+import eu.darken.fpv.dvca.usb.connection.io.UsbDataSource
 import okio.BufferedSink
 import okio.BufferedSource
 import okio.buffer
-import okio.source
 import timber.log.Timber
 import java.io.Closeable
 
@@ -84,16 +83,16 @@ class DVCAConnection(
                 rawConnection
             ).buffer()
 
-            fun source(): BufferedSource = AndroidUSBInputStream2(
-                rawEndpoint,
-                rawConnection
-            ).source().buffer()
-
-            // TODO Tweak to gain better USB read performance and less delay
-//            fun source(): BufferedSource = UsbDataSource(
+//            fun source(): BufferedSource = AndroidUSBInputStream2(
 //                rawEndpoint,
 //                rawConnection
-//            ).buffer()
+//            ).source().buffer()
+
+            // TODO Tweak to gain better USB read performance and less delay
+            fun source(): BufferedSource = UsbDataSource(
+                rawEndpoint,
+                rawConnection
+            ).buffer()
 
             companion object {
                 private val TAG = App.logTag("Usb", "Device", "Connection", "Interface", "Endpoint")

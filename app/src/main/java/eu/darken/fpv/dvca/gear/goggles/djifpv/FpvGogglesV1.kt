@@ -38,12 +38,13 @@ class FpvGogglesV1(
         if (device == null) {
             Timber.tag(TAG).w("Device disconnected!")
 
-            if (videoFeedInternal.value != null) {
-                wasVideoActive = true
+            val wasActive = videoFeedInternal.value != null
+            if (wasActive) {
                 Timber.tag(TAG).d("Video feed was active on disconnect, will restart after reconnect.")
             }
 
             stopVideoFeed()
+            wasVideoActive = wasActive
             eventsInternal.value = Gear.Event.GearDetached(this)
         } else if (reconnect) {
             Timber.tag(TAG).w("Device reconnected!")
@@ -71,6 +72,7 @@ class FpvGogglesV1(
         }
 
         connection = device.openConnection()
+
         return FpvGogglesV1VideoFeed(connection!!).also { feed ->
             videoFeedInternal.value = feed
         }
@@ -78,13 +80,14 @@ class FpvGogglesV1(
 
     override suspend fun stopVideoFeed() {
         Timber.tag(TAG).i("stopVideoFeed()")
-        videoFeedInternal.value?.close()
+        videoFeedInternal.value?.let {
+            it.close()
+            wasVideoActive = false
+        }
         videoFeedInternal.value = null
 
         connection?.close()
         connection = null
-
-        wasVideoActive = true
     }
 
     companion object {
