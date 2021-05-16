@@ -2,9 +2,11 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="eu.darken.fpv.dvca">
 
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+
     <uses-feature
         android:name="android.hardware.usb.host"
-        android:required="true"/>
+        android:required="true" />
 
     <application
         android:name="eu.darken.fpv.dvca.App"
@@ -23,19 +25,21 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity>
-        <service android:name="eu.darken.fpv.dvca.videofeed.core.service.ExampleService" />
 
-        <receiver android:name=".usb.core.UsbDeviceEventReceiver">
-            <intent-filter >
-                <action android:name="android.hardware.usb.action.USB_STATE"/>
-                <action android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED"/>
-                <action android:name="android.hardware.usb.action.USB_DEVICE_DETACHED"/>
+            <!--            <intent-filter>-->
+            <!--                <action android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED" />-->
+            <!--            </intent-filter>-->
+
+            <!--            <meta-data android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED"-->
+            <!--                android:resource="@xml/usb_device_filter" />-->
+        </activity>
+
+        <receiver android:name=".usb.manager.UsbDeviceEventReceiver">
+            <intent-filter>
+                <action android:name="android.hardware.usb.action.USB_STATE" />
+                <action android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED" />
+                <action android:name="android.hardware.usb.action.USB_DEVICE_DETACHED" />
             </intent-filter>
-            <meta-data android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED"
-                android:resource="@xml/usb_device_filter"/>
-            <meta-data android:name="android.hardware.usb.action.USB_DEVICE_DETACHED"
-                android:resource="@xml/usb_device_filter"/>
         </receiver>
     </application>
 

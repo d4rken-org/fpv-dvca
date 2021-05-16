@@ -1,4 +1,4 @@
-package eu.darken.fpv.dvca.usb.core
+package eu.darken.fpv.dvca.usb.manager
 
 import android.hardware.usb.UsbDevice
 

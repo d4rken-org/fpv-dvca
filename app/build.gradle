@@ -102,7 +102,8 @@ android {
                     "-Xuse-experimental=kotlinx.coroutines.ExperimentalCoroutinesApi",
                     "-Xuse-experimental=kotlinx.coroutines.FlowPreview",
                     "-Xuse-experimental=kotlin.time.ExperimentalTime",
-                    "-Xopt-in=kotlin.RequiresOptIn"
+                    "-Xopt-in=kotlin.RequiresOptIn",
+                    "-Xjvm-default=enable"
             ]
         }
     }
@@ -128,6 +129,9 @@ android {
 }
 
 dependencies {
+    implementation("com.squareup.okio:okio:3.0.0-alpha.4")
+    implementation 'com.google.android.exoplayer:exoplayer:2.14.0'
+
     // Kotlin
     implementation "org.jetbrains.kotlin:kotlin-stdlib:${versions.kotlin.core}"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:${versions.kotlin.coroutines}"
@@ -143,7 +147,7 @@ dependencies {
 
     // Debugging
     implementation "com.jakewharton.timber:timber:4.7.1"
-    implementation ('com.bugsnag:bugsnag-android:5.9.2')
+    implementation('com.bugsnag:bugsnag-android:5.9.2')
     implementation 'com.getkeepsafe.relinker:relinker:1.4.3'
 
 

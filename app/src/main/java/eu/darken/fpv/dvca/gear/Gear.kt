@@ -1,8 +1,9 @@
 package eu.darken.fpv.dvca.gear
 
-import eu.darken.fpv.dvca.usb.core.DVCADevice
+import eu.darken.fpv.dvca.usb.DVCADevice
+import kotlinx.coroutines.flow.Flow
 
-sealed interface Gear {
+interface Gear {
     val device: DVCADevice
 
     val identifier: String
@@ -13,9 +14,17 @@ sealed interface Gear {
 
     val isGearConnected: Boolean
 
-    fun updateDevice(device: DVCADevice?)
+    val events: Flow<Event>
 
-    interface Goggles : Gear
+    sealed interface Event {
+        val gear: Gear
+
+        data class GearAttached(override val gear: Gear) : Event
+
+        data class GearDetached(override val gear: Gear) : Event
+    }
+
+    suspend fun updateDevice(device: DVCADevice?)
 
     interface Factory {
         fun canHandle(device: DVCADevice): Boolean

@@ -1,4 +1,4 @@
-package eu.darken.fpv.dvca.usb.core
+package eu.darken.fpv.dvca.usb.manager
 
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -31,7 +31,6 @@ class UsbDeviceEventReceiver : BroadcastReceiver() {
             }
             ACTION_USB_STATE -> {
                 Timber.tag(TAG).d("%s -> ACTION_USB_STATE", device?.label)
-                device?.let { usbDeviceManager.refresh(it) }
             }
             else -> Timber.tag(TAG).w("Unknown ACTION: %s", intent.action)
         }

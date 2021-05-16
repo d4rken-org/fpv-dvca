@@ -12,4 +12,5 @@
     <string name="onboarding_flysafe_description">Fly safe and have a good time!</string>
     <string name="action_start">Start</string>
     <string name="app_name_long">Digital Video Companion App</string>
+    <string name="status_message_waiting_for_device">Waiting for USB device</string>
 </resources>

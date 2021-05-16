@@ -1,4 +1,4 @@
-package eu.darken.fpv.dvca.usb.core
+package eu.darken.fpv.dvca.usb.manager
 
 import android.app.PendingIntent
 import android.content.BroadcastReceiver
@@ -9,6 +9,7 @@ import android.hardware.usb.UsbManager
 import dagger.hilt.android.qualifiers.ApplicationContext
 import eu.darken.fpv.dvca.App
 import eu.darken.fpv.dvca.common.BuildConfigWrap
+import eu.darken.fpv.dvca.usb.DVCADevice
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withTimeout
 import timber.log.Timber
@@ -53,6 +54,7 @@ class UsbPermissionHandler @Inject constructor(
                     val isGranted = intent.getBooleanExtra(UsbManager.EXTRA_PERMISSION_GRANTED, false).also {
                         Timber.tag(TAG).i("Permission request result was: isGranted=%b", it)
                     }
+                    context.unregisterReceiver(this)
                     cont.resume(isGranted)
                 }
             }
@@ -68,7 +70,7 @@ class UsbPermissionHandler @Inject constructor(
 
 
             Timber.tag(TAG).i("Requesting permission for %s", device)
-            usbManager.requestPermission(device.raw, pi)
+            usbManager.requestPermission(device.rawDevice, pi)
         }
     }
 
