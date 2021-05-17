@@ -22,7 +22,11 @@ class FPVFeedPlayer @Inject constructor(
 ) {
 
     private val loadControl = DefaultLoadControl.Builder().apply {
-        setBufferDurationsMs(500, 2_000, 10, 10)
+        setBufferDurationsMs(1, 20000, 1, 1)
+//        setTargetBufferBytes(0)
+//        setBackBuffer(50, true)
+//        setPrioritizeTimeOverSizeThresholds(true)
+//        setAllocator(DefaultAllocator(true,512))
     }.build()
 
     private val renderersFactory = CustomRendererFactory(
@@ -36,7 +40,7 @@ class FPVFeedPlayer @Inject constructor(
         setLoadControl(loadControl)
         setVideoScalingMode(C.VIDEO_SCALING_MODE_SCALE_TO_FIT_WITH_CROPPING)
         setWakeMode(C.WAKE_MODE_LOCAL)
-
+        setUseLazyPreparation(true)
     }.build()
 
     private val renderInfoListeners = mutableListOf<(RenderInfo) -> Unit>()

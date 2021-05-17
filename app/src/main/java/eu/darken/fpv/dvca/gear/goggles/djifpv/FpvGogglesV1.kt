@@ -6,6 +6,7 @@ import eu.darken.fpv.dvca.gear.GearManager
 import eu.darken.fpv.dvca.gear.goggles.Goggles
 import eu.darken.fpv.dvca.usb.HWDevice
 import eu.darken.fpv.dvca.usb.connection.HWConnection
+import eu.darken.fpv.dvca.usb.connection.HWEndpoint
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.filterNotNull
@@ -73,7 +74,10 @@ class FpvGogglesV1(
 
         connection = device.openConnection()
 
-        return FpvGogglesV1VideoFeed(connection!!).also { feed ->
+        return FpvGogglesV1VideoFeed(
+            connection!!,
+            usbReadMode = HWEndpoint.ReadMode.PIPE,
+        ).also { feed ->
             videoFeedInternal.value = feed
         }
     }

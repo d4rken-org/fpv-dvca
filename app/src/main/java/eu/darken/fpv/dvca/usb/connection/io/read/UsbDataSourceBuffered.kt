@@ -1,19 +1,20 @@
-package eu.darken.fpv.dvca.usb.connection.io
+package eu.darken.fpv.dvca.usb.connection.io.read
 
 import android.hardware.usb.UsbDeviceConnection
 import android.hardware.usb.UsbEndpoint
 import android.os.SystemClock
 import eu.darken.fpv.dvca.App
+import eu.darken.fpv.dvca.usb.connection.io.HasUsbStats
 import okio.*
 import timber.log.Timber
 import java.io.InterruptedIOException
 import java.util.concurrent.TimeUnit
 import kotlin.concurrent.thread
 
-class UsbDataSource(
+class UsbDataSourceBuffered(
     private val sender: UsbEndpoint,
     private val connection: UsbDeviceConnection,
-) : Source {
+) : Source, HasUsbStats {
 
     private val pipe = Pipe(16 * 1024 * 1024)
     private val source = pipe.source.also {
@@ -22,7 +23,16 @@ class UsbDataSource(
     private val sink = pipe.sink.buffer().also {
         timeout().timeout(200, TimeUnit.MILLISECONDS)
     }
+
     private var open = true
+
+    private var usbReadRate: Double = 0.0
+    override val usbReadMbs: Double
+        get() = usbReadRate
+
+    private var bufferReadRate: Double = 0.0
+    override val bufferReadMbs: Double
+        get() = bufferReadRate
 
     init {
         thread {
@@ -66,6 +76,8 @@ class UsbDataSource(
             }
             Timber.tag(TAG).w("Read worker quit...")
             sink.close()
+            usbReadRate = -1.0
+            bufferReadRate = -1.0
         }
     }
 
@@ -91,15 +103,12 @@ class UsbDataSource(
 
     override fun timeout(): Timeout = pipe.source.timeout()
 
-    @Throws(IOException::class)
     override fun close() {
         Timber.tag(TAG).v("close()")
         open = false
     }
 
     companion object {
-        private val TAG = App.logTag("Usb", "DataSource")
-        var usbReadRate: Double = 0.0
-        var bufferReadRate: Double = 0.0
+        private val TAG = App.logTag("Usb", "UsbDataSourceBuffered")
     }
 }

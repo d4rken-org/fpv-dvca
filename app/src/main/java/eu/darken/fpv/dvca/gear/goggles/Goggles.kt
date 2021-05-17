@@ -15,6 +15,9 @@ interface Goggles : Gear {
     interface VideoFeed {
         val exoDataSource: DataSource
 
+        val videoUsbReadMbs: Double
+        val videoBufferReadMbs: Double
+
         fun close()
     }
 }

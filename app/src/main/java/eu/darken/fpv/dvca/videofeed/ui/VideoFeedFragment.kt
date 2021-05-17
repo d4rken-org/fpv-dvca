@@ -12,7 +12,7 @@ import eu.darken.fpv.dvca.common.smart.SmartFragment
 import eu.darken.fpv.dvca.common.viewbinding.viewBindingLazy
 import eu.darken.fpv.dvca.databinding.VideofeedFragmentBinding
 import eu.darken.fpv.dvca.gear.GearManager
-import eu.darken.fpv.dvca.gear.goggles.djifpv.FpvGogglesV1VideoFeed
+import eu.darken.fpv.dvca.gear.goggles.Goggles
 import eu.darken.fpv.dvca.videofeed.core.FPVFeedPlayer
 import eu.darken.fpv.dvca.videofeed.core.RenderInfo
 import javax.inject.Inject
@@ -45,7 +45,7 @@ class VideoFeedFragment : SmartFragment(R.layout.videofeed_fragment) {
                 feedPlayer.start(
                     source = feed.exoDataSource,
                     surfaceView = binding.videoCanvas,
-                    renderInfoListener = { info -> updateMetaData(info) }
+                    renderInfoListener = { info -> updateMetaData(info, feed) }
                 )
             } else {
                 feedPlayer.stop()
@@ -62,11 +62,11 @@ class VideoFeedFragment : SmartFragment(R.layout.videofeed_fragment) {
         }
     }
 
-    private fun updateMetaData(info: RenderInfo) {
+    private fun updateMetaData(info: RenderInfo, feed: Goggles.VideoFeed) {
         val sb = StringBuilder()
         sb.append(info.toString())
-        sb.append(", USB ${FpvGogglesV1VideoFeed.usbReadRate} MB/s")
-        sb.append(", Buffer ${FpvGogglesV1VideoFeed.bufferReadRate} MB/s")
+        sb.append(", USB ${feed.videoUsbReadMbs} MB/s")
+        sb.append(", Buffer ${feed.videoBufferReadMbs} MB/s")
 
         binding.videoMetadata.text = sb.toString()
     }

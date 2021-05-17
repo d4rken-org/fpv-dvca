@@ -1,4 +1,4 @@
-package eu.darken.fpv.dvca.usb.connection.io
+package eu.darken.fpv.dvca.usb.connection.io.write
 
 import android.hardware.usb.UsbDeviceConnection
 import android.hardware.usb.UsbEndpoint

@@ -1,4 +1,4 @@
-package eu.darken.fpv.dvca.usb.connection.io
+package eu.darken.fpv.dvca.usb.connection.io.read
 
 /*
 * Copyright 2019, Digi International Inc.
@@ -20,6 +20,8 @@ import android.hardware.usb.UsbDeviceConnection
 import android.hardware.usb.UsbEndpoint
 import android.os.SystemClock
 import eu.darken.fpv.dvca.App
+import eu.darken.fpv.dvca.usb.connection.io.CircularByteBuffer
+import eu.darken.fpv.dvca.usb.connection.io.HasUsbStats
 import timber.log.Timber
 import java.io.InputStream
 import kotlin.concurrent.thread
@@ -41,10 +43,17 @@ import kotlin.concurrent.thread
 class AndroidUSBInputStream2(
     private val receiveEndPoint: UsbEndpoint,
     private val usbConnection: UsbDeviceConnection,
-) : InputStream() {
+) : InputStream(), HasUsbStats {
 
     private var open = true
     private var readBuffer: CircularByteBuffer = CircularByteBuffer(50 * 1024 * 1024)
+
+    private var usbReadRate: Double = 0.0
+    override val usbReadMbs: Double
+        get() = usbReadRate
+    private var bufferReadRate: Double = 0.0
+    override val bufferReadMbs: Double
+        get() = bufferReadRate
 
     init {
         var bytesRead = 0L
@@ -72,6 +81,8 @@ class AndroidUSBInputStream2(
                     Timber.tag(TAG).v("Reading $mbPerSecond MB/s from USB")
                 }
             }
+            usbReadRate = -1.0
+            bufferReadRate = -1.0
         }
     }
 
@@ -153,7 +164,5 @@ class AndroidUSBInputStream2(
     companion object {
         private const val READ_TIMEOUT = 100
         private val TAG = App.logTag("Usb", "AndroidUSBInputStream2")
-        var usbReadRate: Double = 0.0
-        var bufferReadRate: Double = 0.0
     }
 }

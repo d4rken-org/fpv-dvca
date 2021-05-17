@@ -8,14 +8,14 @@ import com.google.android.exoplayer2.upstream.TransferListener
 import eu.darken.fpv.dvca.App
 import eu.darken.fpv.dvca.gear.goggles.Goggles
 import eu.darken.fpv.dvca.usb.connection.HWConnection
-import eu.darken.fpv.dvca.usb.connection.io.AndroidUSBInputStream2
-import eu.darken.fpv.dvca.usb.connection.io.UsbDataSource
+import eu.darken.fpv.dvca.usb.connection.HWEndpoint
 import okio.BufferedSink
 import okio.BufferedSource
 import timber.log.Timber
 
 class FpvGogglesV1VideoFeed(
     private val connection: HWConnection,
+    private val usbReadMode: HWEndpoint.ReadMode,
 ) : Goggles.VideoFeed {
     private val intf = connection.getInterface(3)
     private val cmdEndpoint = intf.getEndpoint(0)
@@ -34,7 +34,7 @@ class FpvGogglesV1VideoFeed(
             intf.claim(forced = false)
 
             var newCmdSink = cmdEndpoint.sink()
-            var newVideoSource = videoEndpoint.source()
+            var newVideoSource = videoEndpoint.source(readMode = usbReadMode)
 
             try {
                 Timber.tag(TAG).v("Waiting for video feed to start.")
@@ -65,7 +65,7 @@ class FpvGogglesV1VideoFeed(
 
                 Thread.sleep(100)
 
-                newVideoSource = videoEndpoint.source()
+                newVideoSource = videoEndpoint.source(readMode = usbReadMode)
 
                 Timber.tag(TAG).d("Video feed restart attempt done.")
             }
@@ -93,6 +93,11 @@ class FpvGogglesV1VideoFeed(
         }
     }
 
+    override val videoUsbReadMbs: Double
+        get() = videoEndpoint.readStats.usbReadMbs
+    override val videoBufferReadMbs: Double
+        get() = videoEndpoint.readStats.bufferReadMbs
+
     override fun close() {
         Timber.tag(TAG).v("close() feed, this=%s", this)
         exoDataSource.close()
@@ -103,17 +108,5 @@ class FpvGogglesV1VideoFeed(
         private val TAG = App.logTag("Gear", "FpvGogglesV1", "VideoFeed")
 
         private val MAGIC_FPVOUT_PACKET = "RMVT".toByteArray()
-
-        val usbReadRate: Double
-            get() = when {
-                UsbDataSource.usbReadRate != 0.0 -> UsbDataSource.usbReadRate
-                else -> AndroidUSBInputStream2.usbReadRate
-            }
-
-        val bufferReadRate: Double
-            get() = when {
-                UsbDataSource.bufferReadRate != 0.0 -> UsbDataSource.bufferReadRate
-                else -> AndroidUSBInputStream2.bufferReadRate
-            }
     }
 }
