@@ -9,7 +9,7 @@ import android.hardware.usb.UsbManager
 import dagger.hilt.android.qualifiers.ApplicationContext
 import eu.darken.fpv.dvca.App
 import eu.darken.fpv.dvca.common.BuildConfigWrap
-import eu.darken.fpv.dvca.usb.DVCADevice
+import eu.darken.fpv.dvca.usb.HWDevice
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withTimeout
 import timber.log.Timber
@@ -34,7 +34,7 @@ class UsbPermissionHandler @Inject constructor(
 
     private val filter = IntentFilter(ACTION_USB_PERMISSION)
 
-    suspend fun requestPermission(device: DVCADevice) = withTimeout(30_000) {
+    suspend fun requestPermission(device: HWDevice) = withTimeout(30_000) {
         suspendCancellableCoroutine<Boolean> { cont ->
             val requestCode = Random.nextInt()
             val pi = createPendingIntent(requestCode)

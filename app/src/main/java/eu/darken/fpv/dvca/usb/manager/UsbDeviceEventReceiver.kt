@@ -12,7 +12,7 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class UsbDeviceEventReceiver : BroadcastReceiver() {
-    @Inject lateinit var usbDeviceManager: DVCADeviceManager
+    @Inject lateinit var usbDeviceManager: HWDeviceManager
 
     override fun onReceive(context: Context, intent: Intent) {
         Timber.tag(TAG).v("onReceive(context=%s, intent=%s)", context, intent)

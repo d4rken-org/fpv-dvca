@@ -3,8 +3,8 @@ package eu.darken.fpv.dvca.gear
 import eu.darken.fpv.dvca.App
 import eu.darken.fpv.dvca.common.coroutine.AppScope
 import eu.darken.fpv.dvca.gear.goggles.djifpv.FpvGogglesV1
-import eu.darken.fpv.dvca.usb.DVCADevice
-import eu.darken.fpv.dvca.usb.manager.DVCADeviceManager
+import eu.darken.fpv.dvca.usb.HWDevice
+import eu.darken.fpv.dvca.usb.manager.HWDeviceManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.sync.Mutex
@@ -16,7 +16,7 @@ import javax.inject.Singleton
 @Singleton
 class GearManager @Inject constructor(
     @AppScope private val appScope: CoroutineScope,
-    private val deviceManager: DVCADeviceManager,
+    private val deviceManager: HWDeviceManager,
     fpvGogglesV1Factory: FpvGogglesV1.Factory
 ) {
 
@@ -39,7 +39,7 @@ class GearManager @Inject constructor(
             .launchIn(appScope)
     }
 
-    private suspend fun updateGearMap(devices: Set<DVCADevice>) = mutex.withLock {
+    private suspend fun updateGearMap(devices: Set<HWDevice>) = mutex.withLock {
         Timber.tag(TAG).v("Updating gear...")
 
         gearMap.values.forEach { gear ->
@@ -65,9 +65,9 @@ class GearManager @Inject constructor(
         internalGearFlow.value = gearMap.values.toSet()
     }
 
-    private fun DVCADevice.findFactory(): Gear.Factory? = factories.singleOrNull { it.canHandle(this) }
+    private fun HWDevice.findFactory(): Gear.Factory? = factories.singleOrNull { it.canHandle(this) }
 
-    private fun DVCADevice.createGear(): Gear? {
+    private fun HWDevice.createGear(): Gear? {
         val factory = this.findFactory()
         if (factory == null) {
             Timber.tag(TAG).i("No gear factory to handle device: %s", this.label)

@@ -7,7 +7,7 @@ import com.google.android.exoplayer2.upstream.DataSpec
 import com.google.android.exoplayer2.upstream.TransferListener
 import eu.darken.fpv.dvca.App
 import eu.darken.fpv.dvca.gear.goggles.Goggles
-import eu.darken.fpv.dvca.usb.connection.DVCAConnection
+import eu.darken.fpv.dvca.usb.connection.HWConnection
 import eu.darken.fpv.dvca.usb.connection.io.AndroidUSBInputStream2
 import eu.darken.fpv.dvca.usb.connection.io.UsbDataSource
 import okio.BufferedSink
@@ -15,7 +15,7 @@ import okio.BufferedSource
 import timber.log.Timber
 
 class FpvGogglesV1VideoFeed(
-    private val connection: DVCAConnection,
+    private val connection: HWConnection,
 ) : Goggles.VideoFeed {
     private val intf = connection.getInterface(3)
     private val cmdEndpoint = intf.getEndpoint(0)

@@ -13,7 +13,7 @@ import okio.buffer
 import timber.log.Timber
 import java.io.Closeable
 
-class DVCAConnection(
+class HWConnection(
     private val rawDevice: UsbDevice,
     private val rawConnection: UsbDeviceConnection,
 ) : Closeable {

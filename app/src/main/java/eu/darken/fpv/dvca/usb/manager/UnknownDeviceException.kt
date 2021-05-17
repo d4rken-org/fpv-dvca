@@ -1,7 +1,7 @@
 package eu.darken.fpv.dvca.usb.manager
 
 import android.hardware.usb.UsbDevice
-import eu.darken.fpv.dvca.usb.DVCADevice
+import eu.darken.fpv.dvca.usb.HWDevice
 
 class UnknownDeviceException(
     deviceIdentifier: String,
@@ -11,7 +11,7 @@ class UnknownDeviceException(
 ) {
 
     constructor(
-        device: DVCADevice,
+        device: HWDevice,
         message: String = "",
     ) : this(
         deviceIdentifier = device.identifier,

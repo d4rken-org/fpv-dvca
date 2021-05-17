@@ -4,8 +4,8 @@ import eu.darken.fpv.dvca.App
 import eu.darken.fpv.dvca.gear.Gear
 import eu.darken.fpv.dvca.gear.GearManager
 import eu.darken.fpv.dvca.gear.goggles.Goggles
-import eu.darken.fpv.dvca.usb.DVCADevice
-import eu.darken.fpv.dvca.usb.connection.DVCAConnection
+import eu.darken.fpv.dvca.usb.HWDevice
+import eu.darken.fpv.dvca.usb.connection.HWConnection
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.filterNotNull
@@ -14,11 +14,11 @@ import javax.inject.Inject
 
 class FpvGogglesV1(
     private val gearManager: GearManager,
-    private val initialDevice: DVCADevice,
+    private val initialDevice: HWDevice,
 ) : Goggles {
-    private var currentDevice: DVCADevice? = initialDevice
+    private var currentDevice: HWDevice? = initialDevice
 
-    override val device: DVCADevice
+    override val device: HWDevice
         get() = currentDevice ?: initialDevice
 
     override val isGearConnected: Boolean
@@ -30,7 +30,7 @@ class FpvGogglesV1(
 
     private var wasVideoActive: Boolean = false
 
-    override suspend fun updateDevice(device: DVCADevice?) {
+    override suspend fun updateDevice(device: HWDevice?) {
         Timber.tag(TAG).d("updateDevice(device=%s)", device)
 
         val reconnect = device != null && currentDevice == null
@@ -62,7 +62,7 @@ class FpvGogglesV1(
     private val videoFeedInternal = MutableStateFlow<Goggles.VideoFeed?>(null)
     override val videoFeed: Flow<Goggles.VideoFeed?> = videoFeedInternal
 
-    private var connection: DVCAConnection? = null
+    private var connection: HWConnection? = null
 
     override suspend fun startVideoFeed(): Goggles.VideoFeed {
         Timber.tag(TAG).i("startVideoFeed()")
@@ -98,13 +98,13 @@ class FpvGogglesV1(
 
     class Factory @Inject constructor() : Gear.Factory {
 
-        override fun canHandle(device: DVCADevice): Boolean = device.rawDevice.run {
+        override fun canHandle(device: HWDevice): Boolean = device.rawDevice.run {
             vendorId == VENDOR_ID && productId == PRODUCT_ID
         }
 
         override fun create(
             gearManager: GearManager,
-            device: DVCADevice
+            device: HWDevice
         ): Goggles = FpvGogglesV1(
             gearManager = gearManager,
             initialDevice = device,

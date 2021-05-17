@@ -2,14 +2,14 @@ package eu.darken.fpv.dvca.usb
 
 import android.hardware.usb.UsbDevice
 import eu.darken.fpv.dvca.App
-import eu.darken.fpv.dvca.usb.connection.DVCAConnection
-import eu.darken.fpv.dvca.usb.manager.DVCADeviceManager
+import eu.darken.fpv.dvca.usb.connection.HWConnection
+import eu.darken.fpv.dvca.usb.manager.HWDeviceManager
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import timber.log.Timber
 
-class DVCADevice(
-    val dvcaManager: DVCADeviceManager,
+class HWDevice(
+    val hwManager: HWDeviceManager,
     val rawDevice: UsbDevice,
 ) {
     private val mutex = Mutex()
@@ -21,17 +21,17 @@ class DVCADevice(
         get() = "${rawDevice.manufacturerName} \"${rawDevice.productName}\" (${rawDevice.deviceName})"
 
     val hasPermission: Boolean
-        get() = dvcaManager.hasPermission(this)
+        get() = hwManager.hasPermission(this)
 
     private suspend fun requirePermission() {
-        if (!hasPermission) dvcaManager.requestPermission(this)
+        if (!hasPermission) hwManager.requestPermission(this)
     }
 
-    private val openConnections = mutableSetOf<DVCAConnection>()
+    private val openConnections = mutableSetOf<HWConnection>()
 
-    suspend fun openConnection(): DVCAConnection = mutex.withLock {
+    suspend fun openConnection(): HWConnection = mutex.withLock {
         requirePermission()
-        val connection = dvcaManager.openDevice(this)
+        val connection = hwManager.openDevice(this)
         openConnections.add(connection)
         return connection
     }
