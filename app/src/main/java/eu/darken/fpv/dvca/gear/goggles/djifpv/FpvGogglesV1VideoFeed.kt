@@ -31,47 +31,28 @@ class FpvGogglesV1VideoFeed(
         override fun open(dataSpec: DataSpec): Long {
             Timber.tag(TAG).v("open(dataSpec=%s) this=%s", dataSpec, this)
 
-            intf.claim(forced = false)
+            intf.claim(forced = true)
 
-            var newCmdSink = cmdEndpoint.sink()
-            var newVideoSource = videoEndpoint.source(readMode = usbReadMode)
+            val cmdSink = cmdEndpoint.sink()
+            val videoSource = videoEndpoint.source(readMode = usbReadMode)
 
             try {
                 Timber.tag(TAG).v("Waiting for video feed to start.")
-                newCmdSink.apply {
-                    Timber.tag(TAG).d("Writing magic packet.")
-                    write(MAGIC_FPVOUT_PACKET)
-                    flush()
-                }
-                newVideoSource.readByteArray(64)
-                Timber.tag(TAG).v("Waiting for video feed has started.")
+                val readBytes = videoSource.readByteArray(131072)
+                Timber.tag(TAG).v("Video feed has started, we got %d bytes", readBytes.size)
             } catch (e: Exception) {
                 // java.io.InterruptedIOException: timeout ?
                 Timber.tag(TAG).v(e, "Failed to open video feed, needs magic packet.")
 
-                newCmdSink.close()
-                newVideoSource.close()
-
-                intf.apply {
-                    release()
-                    claim(forced = true)
-                }
-
-                newCmdSink = cmdEndpoint.sink().apply {
+                cmdSink.apply {
                     Timber.tag(TAG).d("Writing new magic packet.")
                     write(MAGIC_FPVOUT_PACKET)
                     flush()
                 }
-
-                Thread.sleep(100)
-
-                newVideoSource = videoEndpoint.source(readMode = usbReadMode)
-
-                Timber.tag(TAG).d("Video feed restart attempt done.")
             }
 
-            cmdSink = newCmdSink
-            videoSource = newVideoSource
+            this@FpvGogglesV1VideoFeed.cmdSink = cmdSink
+            this@FpvGogglesV1VideoFeed.videoSource = videoSource
 
             return if (dataSpec.length != C.LENGTH_UNSET.toLong()) {
                 dataSpec.length
