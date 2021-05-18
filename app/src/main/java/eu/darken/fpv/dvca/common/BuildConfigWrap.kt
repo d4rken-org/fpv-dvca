@@ -13,4 +13,7 @@ object BuildConfigWrap {
     val BUILD_TYPE: String = BuildConfig.BUILD_TYPE
 
     val VERSION_CODE: Long = BuildConfig.VERSION_CODE.toLong()
+    val VERSION_NAME: String = BuildConfig.VERSION_NAME
+
+    val GITSHA: String = BuildConfig.GITSHA
 }

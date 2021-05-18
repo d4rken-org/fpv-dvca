@@ -13,4 +13,5 @@
     <string name="action_start">Start</string>
     <string name="app_name_long">Digital Video Companion App</string>
     <string name="status_message_waiting_for_device">Waiting for USB device</string>
+    <string name="video_feed_player_tease">Ready player %s?</string>
 </resources>

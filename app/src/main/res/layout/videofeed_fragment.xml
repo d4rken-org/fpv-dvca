@@ -5,25 +5,90 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <SurfaceView
-        android:id="@+id/video_canvas"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:keepScreenOn="true"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <TextView
-        android:id="@+id/video_metadata"
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textColor="@color/white"
-        android:background="@color/black"
-        android:alpha="0.6"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        style="@style/Widget.MaterialComponents.Toolbar.Primary"
         app:layout_constraintStart_toStartOf="parent"
-        tools:text="Metadata" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:subtitle="@string/app_name_long"
+        app:title="@string/app_name_short" />
+
+    <FrameLayout
+        android:id="@+id/player1_container"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toTopOf="@id/player2_container"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/toolbar">
+
+        <SurfaceView
+            android:id="@+id/player1_canvas"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:keepScreenOn="true"
+            android:visibility="invisible"
+            tools:visibility="visible" />
+
+        <TextView
+            android:id="@+id/player1_metadata"
+            style="@style/FeedMetaDataText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="start|bottom"
+            android:visibility="invisible"
+            tools:text="Metadata"
+            tools:visibility="visible" />
+
+        <TextView
+            android:id="@+id/player1_placeholder"
+            style="@style/TextAppearance.MaterialComponents.Headline5"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            tools:text="Ready player %s?" />
+    </FrameLayout>
+
+    <FrameLayout
+        android:id="@+id/player2_container"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/player1_container"
+        tools:visibility="visible">
+
+        <SurfaceView
+            android:id="@+id/player2_canvas"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:keepScreenOn="true"
+            android:visibility="invisible"
+            tools:visibility="visible" />
+
+        <TextView
+            android:id="@+id/player2_metadata"
+            style="@style/FeedMetaDataText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="start|bottom"
+            android:visibility="invisible"
+            tools:text="Metadata"
+            tools:visibility="visible" />
+
+        <TextView
+            android:id="@+id/player2_placeholder"
+            style="@style/TextAppearance.MaterialComponents.Headline5"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            tools:text="Ready player %s?" />
+    </FrameLayout>
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>
