@@ -21,6 +21,7 @@ import eu.darken.fpv.dvca.gear.GearManager
 import eu.darken.fpv.dvca.gear.goggles.Goggles
 import eu.darken.fpv.dvca.videofeed.core.FPVFeedPlayer
 import eu.darken.fpv.dvca.videofeed.core.RenderInfo
+import timber.log.Timber
 import javax.inject.Inject
 
 
@@ -112,6 +113,11 @@ class VideoFeedFragment : SmartFragment(R.layout.videofeed_fragment) {
     }
 
     private fun updateMetaData(info: RenderInfo, feed: Goggles.VideoFeed) {
+        if (view == null) {
+            Timber.tag(TAG).v("View was null?")
+            return
+        }
+
         val sb = StringBuilder(versionTag)
         sb.append(" ")
         sb.append(info.toString())
