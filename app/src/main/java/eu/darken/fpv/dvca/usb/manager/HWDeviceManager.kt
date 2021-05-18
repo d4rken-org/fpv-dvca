@@ -41,7 +41,7 @@ class HWDeviceManager @Inject constructor(
     ) {
         Timber.tag(TAG).v("onDeviceAttached(rawDevice=%s)", rawDevice.label)
 
-        val added = usbManager.find(rawDevice.identifier) ?: throw UnknownDeviceException(rawDevice)
+        val added = rawDevice.toHWDevice()
 
         this[rawDevice.identifier]?.let {
             Timber.tag(TAG).w("Double attach? Releasing previous device: %s", it)
@@ -64,7 +64,7 @@ class HWDeviceManager @Inject constructor(
             Timber.tag(TAG).w("Failed to remove %s, already removed?", rawDevice.label)
             return@updateAsync this
         } else {
-            Timber.tag(TAG).i("Removing detached devices %s", toRemove.label)
+            Timber.tag(TAG).i("Removing detached devices %s", toRemove.logId)
             toRemove.release()
         }
 
@@ -88,15 +88,22 @@ class HWDeviceManager @Inject constructor(
         return HWConnection(
             rawDevice = device.rawDevice,
             rawConnection = rawConnection
-        ).also { Timber.tag(TAG).d("Connection to %s opened: %s", device.label, it) }
+        ).also { Timber.tag(TAG).d("Connection to %s opened: %s", device.logId, it) }
     }
 
-    fun hasPermission(device: HWDevice): Boolean {
-        return usbManager.hasPermission(device.rawDevice)
-    }
+    fun hasPermission(device: HWDevice): Boolean = usbManager.hasPermission(device.rawDevice)
 
     suspend fun requestPermission(device: HWDevice): Boolean {
-        return usbPermissionHandler.requestPermission(device)
+        Timber.tag(TAG).v("Requesting permission for %s", device.logId)
+
+        if (hasPermission(device)) {
+            Timber.tag(TAG).w("Unnecessary permission request, we already have it.")
+            return true
+        }
+
+        return usbPermissionHandler.requestPermission(device).also {
+            Timber.tag(TAG).v("Permission request isGranted=$it for %s", device.logId)
+        }
     }
 
     companion object {

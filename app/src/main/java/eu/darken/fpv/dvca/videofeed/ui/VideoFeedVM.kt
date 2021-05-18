@@ -21,9 +21,9 @@ class VideoFeedVM @Inject constructor(
         }
         .filterNotNull()
         .onEach {
-            Timber.tag(TAG).d("Device available: %s", it.label)
+            Timber.tag(TAG).d("Device available: %s", it.logId)
             if (it.videoFeed.first() == null) {
-                Timber.tag(TAG).d("Enabling videofeed for %s", it.label)
+                Timber.tag(TAG).d("Enabling videofeed for %s", it.logId)
                 it.startVideoFeed()
             }
         }

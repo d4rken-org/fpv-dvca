@@ -13,24 +13,33 @@ class HWDevice(
     val rawDevice: UsbDevice,
 ) {
     private val mutex = Mutex()
+    private var storedSerial: String? = null
+    val serialNumber: SerialNumber?
+        get() {
+            val number = storedSerial ?: try {
+                rawDevice.serialNumber?.also { storedSerial = it }
+            } catch (e: SecurityException) {
+                null
+            }
+
+            return number?.let { SerialNumber(it) }
+        }
 
     val identifier: String
         get() = rawDevice.deviceName
 
-    val label: String
-        get() = "${rawDevice.manufacturerName} \"${rawDevice.productName}\" (${rawDevice.deviceName})"
+    val productName: String
+        get() = rawDevice.productName ?: rawDevice.manufacturerName ?: rawDevice.deviceName
 
     val hasPermission: Boolean
         get() = hwManager.hasPermission(this)
 
-    private suspend fun requirePermission() {
-        if (!hasPermission) hwManager.requestPermission(this)
-    }
+    val logId: String
+        get() = "${rawDevice.deviceName} ($productName)"
 
     private val openConnections = mutableSetOf<HWConnection>()
 
     suspend fun openConnection(): HWConnection = mutex.withLock {
-        requirePermission()
         val connection = hwManager.openDevice(this)
         openConnections.add(connection)
         return connection
@@ -41,9 +50,12 @@ class HWDevice(
         openConnections.forEach { it.close() }
     }
 
-    override fun toString(): String = label
+    override fun toString(): String = logId
 
     companion object {
         private val TAG = App.logTag("Usb", "Device")
     }
+
+    @JvmInline
+    value class SerialNumber(val serialNumber: String)
 }

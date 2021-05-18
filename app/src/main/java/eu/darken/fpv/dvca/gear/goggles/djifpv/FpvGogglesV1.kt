@@ -36,16 +36,20 @@ class FpvGogglesV1(
 
         val reconnect = device != null && currentDevice == null
 
+        currentDevice = device
+
         if (device == null) {
             Timber.tag(TAG).w("Device disconnected!")
 
-            val wasActive = videoFeedInternal.value != null
+            val wasActive = videoFeedInternal.value != null || wasVideoActive
             if (wasActive) {
                 Timber.tag(TAG).d("Video feed was active on disconnect, will restart after reconnect.")
             }
 
             stopVideoFeed()
+
             wasVideoActive = wasActive
+
             eventsInternal.value = Gear.Event.GearDetached(this)
         } else if (reconnect) {
             Timber.tag(TAG).w("Device reconnected!")
@@ -54,10 +58,10 @@ class FpvGogglesV1(
             if (wasVideoActive) {
                 Timber.tag(TAG).i("Video feed was previously active, starting again.")
                 startVideoFeed()
+            } else {
+                Timber.tag(TAG).v("Video was previously not active.")
             }
         }
-
-        currentDevice = device
     }
 
     private val videoFeedInternal = MutableStateFlow<Goggles.VideoFeed?>(null)

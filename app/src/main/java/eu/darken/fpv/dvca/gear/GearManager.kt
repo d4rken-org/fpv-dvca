@@ -21,7 +21,7 @@ class GearManager @Inject constructor(
 ) {
 
     private val mutex = Mutex()
-    private val gearMap = mutableMapOf<String, Gear>()
+    private val gearMap = mutableMapOf<HWDevice.SerialNumber, Gear>()
     private val factories = setOf<Gear.Factory>(
         fpvGogglesV1Factory
     )
@@ -35,30 +35,48 @@ class GearManager @Inject constructor(
                 Timber.tag(TAG).v("Devices changed! Updating gearmap.")
                 updateGearMap(devices)
             }
-            .catch { Timber.tag(TAG).e("Failed to handle device status change.") }
+            .catch { Timber.tag(TAG).e(it, "Failed to handle device status change.") }
             .launchIn(appScope)
     }
 
     private suspend fun updateGearMap(devices: Set<HWDevice>) = mutex.withLock {
         Timber.tag(TAG).v("Updating gear...")
 
-        gearMap.values.forEach { gear ->
-            val match = devices.singleOrNull { it.identifier == gear.identifier }
-            gear.updateDevice(match)
+        val gears = devices.mapNotNull { device ->
+            val gear = device.createGear()
+            if (gear == null) {
+                Timber.tag(TAG).d("Unknown device, couldn't create gear: %s", device.logId)
+                return@mapNotNull null
+            }
+
+            Timber.tag(TAG).i("Known type of gear: %s", device.logId)
+
+            if (!device.hasPermission) {
+                // Need to be able to read the serial
+                Timber.tag(TAG).d("Missing usb permission, requesting access now")
+                deviceManager.requestPermission(device)
+            }
+
+            gear
         }
 
-        devices.forEach { device ->
-            // Was already updated
-            if (gearMap.containsKey(device.identifier)) return@forEach
+        gearMap.values.forEach { existing ->
+            val match = gears.singleOrNull { it.serialNumber == existing.serialNumber }
+            Timber.tag(TAG).v("Updating gear %s", existing.logId)
+            existing.updateDevice(match?.device)
+        }
 
-            val newGear = device.createGear()
-            if (newGear == null) {
-                Timber.tag(TAG).d("Unknown device, couldn't create gear: %s", device.label)
+        gears.forEach { gear ->
+            val snOfNewGear = gear.serialNumber
+            if (snOfNewGear == null) {
+                Timber.tag(TAG).w("Serial number was unavailable, no permission? Can't add %s", gear.logId)
                 return@forEach
-            } else {
-                Timber.tag(TAG).i("Added new gear: %s", device.label)
             }
-            gearMap[newGear.identifier] = newGear
+
+            // Was already updated
+            if (gearMap.containsKey(snOfNewGear)) return@forEach
+
+            gearMap[snOfNewGear] = gear
         }
 
         Timber.tag(TAG).v("...gear update done.")
@@ -70,11 +88,11 @@ class GearManager @Inject constructor(
     private fun HWDevice.createGear(): Gear? {
         val factory = this.findFactory()
         if (factory == null) {
-            Timber.tag(TAG).i("No gear factory to handle device: %s", this.label)
+            Timber.tag(TAG).i("No gear factory to handle device: %s", this.identifier)
             return null
         }
         return factory.create(this@GearManager, this).also {
-            Timber.tag(TAG).i("Used %s to create %s", factory, it.label)
+            Timber.tag(TAG).i("Used %s to create %s", factory, it)
         }
     }
 
