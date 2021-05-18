@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.filterNotNull
 import timber.log.Timber
+import java.time.Instant
 import javax.inject.Inject
 
 class FpvGogglesV1(
@@ -24,6 +25,8 @@ class FpvGogglesV1(
 
     override val isGearConnected: Boolean
         get() = currentDevice != null
+
+    override val firstSeenAt: Instant = Instant.now()
 
     private val eventsInternal = MutableStateFlow<Gear.Event?>(null)
     override val events: Flow<Gear.Event>

@@ -38,7 +38,7 @@ class FPVFeedPlayer @Inject constructor(
 
     private val player = SimpleExoPlayer.Builder(context, renderersFactory).apply {
         setLoadControl(loadControl)
-        setVideoScalingMode(C.VIDEO_SCALING_MODE_SCALE_TO_FIT_WITH_CROPPING)
+        setVideoScalingMode(C.VIDEO_SCALING_MODE_SCALE_TO_FIT)
         setWakeMode(C.WAKE_MODE_LOCAL)
         setUseLazyPreparation(true)
     }.build()

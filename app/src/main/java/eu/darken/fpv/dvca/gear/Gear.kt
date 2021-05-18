@@ -2,9 +2,12 @@ package eu.darken.fpv.dvca.gear
 
 import eu.darken.fpv.dvca.usb.HWDevice
 import kotlinx.coroutines.flow.Flow
+import    java.time.Instant
 
 interface Gear {
     val device: HWDevice
+
+    val firstSeenAt: Instant
 
     val identifier: String
         get() = device.identifier
