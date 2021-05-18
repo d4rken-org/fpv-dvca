@@ -46,7 +46,7 @@ class AndroidUSBInputStream2(
 ) : InputStream(), HasUsbStats {
 
     private var open = true
-    private var readBuffer: CircularByteBuffer = CircularByteBuffer(50 * 1024 * 1024)
+    private var readBuffer: CircularByteBuffer = CircularByteBuffer(32 * 1024 * 1024)
 
     private var usbReadRate: Double = 0.0
     override val usbReadMbs: Double

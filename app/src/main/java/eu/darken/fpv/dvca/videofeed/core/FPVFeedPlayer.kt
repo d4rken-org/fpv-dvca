@@ -1,18 +1,14 @@
 package eu.darken.fpv.dvca.videofeed.core
 
 import android.content.Context
-import android.net.Uri
 import android.view.SurfaceView
 import com.google.android.exoplayer2.C
 import com.google.android.exoplayer2.DefaultLoadControl
-import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.SimpleExoPlayer
-import com.google.android.exoplayer2.source.MediaSource
-import com.google.android.exoplayer2.source.ProgressiveMediaSource
-import com.google.android.exoplayer2.upstream.DataSource
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.android.scopes.FragmentScoped
 import eu.darken.fpv.dvca.App
+import eu.darken.fpv.dvca.gear.goggles.Goggles
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -49,24 +45,18 @@ class FPVFeedPlayer @Inject constructor(
         get() = player.run { isPlaying || isLoading }
 
     fun start(
-        source: DataSource,
+        feed: Goggles.VideoFeed,
         surfaceView: SurfaceView,
         renderInfoListener: (RenderInfo) -> Unit
     ) {
-        Timber.tag(TAG).d("start(source=%s, view=%s)", source, surfaceView)
+        Timber.tag(TAG).d("start(source=%s, view=%s)", feed, surfaceView)
 
         if (isPlaying) {
             Timber.tag(TAG).w("Already playing? Stopping!")
             stop()
         }
 
-        val mediaSource: MediaSource = run {
-            val dataSourceFactory: DataSource.Factory = DataSource.Factory { source }
-            ProgressiveMediaSource.Factory(
-                dataSourceFactory,
-                H264Extractor2.FACTORY
-            ).createMediaSource(MediaItem.fromUri(Uri.EMPTY))
-        }
+
 
         renderInfoListeners.add { info ->
             surfaceView.post { renderInfoListener(info) }
@@ -74,7 +64,7 @@ class FPVFeedPlayer @Inject constructor(
 
         player.apply {
             setVideoSurfaceView(surfaceView)
-            setMediaSource(mediaSource)
+            setMediaSource(feed.exoMediaSource)
 
             prepare()
             play()

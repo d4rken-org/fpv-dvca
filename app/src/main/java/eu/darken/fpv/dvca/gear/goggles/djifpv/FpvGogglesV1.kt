@@ -83,7 +83,7 @@ class FpvGogglesV1(
 
         return FpvGogglesV1VideoFeed(
             connection!!,
-            usbReadMode = HWEndpoint.ReadMode.PIPE,
+            usbReadMode = HWEndpoint.ReadMode.UNBUFFERED_DIRECT,
         ).also { feed ->
             videoFeedInternal.value = feed
         }

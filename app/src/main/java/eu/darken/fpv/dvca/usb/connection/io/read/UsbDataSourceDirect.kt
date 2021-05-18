@@ -18,14 +18,14 @@ class UsbDataSourceDirect(
 
     private var bufferBytesRead = 0L
     private var bufferBytesLast = SystemClock.elapsedRealtime()
-    private val transferBuffer = ByteArray(16 * 1024)
+    private val transferBuffer = ByteArray(131072)
 
     private var usbReadRate: Double = -1.0
     override val usbReadMbs: Double
         get() = usbReadRate
 
     override fun read(sink: Buffer, byteCount: Long): Long {
-        val readBytes = connection.bulkTransfer(sender, transferBuffer, byteCount.toInt(), 100)
+        val readBytes = connection.bulkTransfer(sender, transferBuffer, byteCount.toInt(), 200)
 
         sink.write(transferBuffer, 0, readBytes)
         sink.flush()

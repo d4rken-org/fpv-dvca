@@ -32,15 +32,15 @@ class HWEndpoint(
         rawConnection
     ).buffer()
 
-    fun source(readMode: ReadMode = ReadMode.PIPE): BufferedSource = when (readMode) {
-        ReadMode.RINGBUFFER -> AndroidUSBInputStream2(rawEndpoint, rawConnection).run {
+    fun source(readMode: ReadMode = ReadMode.BUFFERED_BLOCKING): BufferedSource = when (readMode) {
+        ReadMode.BUFFERED_NOT_BLOCKING -> AndroidUSBInputStream2(rawEndpoint, rawConnection).run {
             readStatsSource = this
             source()
         }
-        ReadMode.PIPE -> UsbDataSourceBuffered(rawEndpoint, rawConnection).apply {
+        ReadMode.BUFFERED_BLOCKING -> UsbDataSourceBuffered(rawEndpoint, rawConnection).apply {
             readStatsSource = this
         }
-        ReadMode.DIRECT -> UsbDataSourceDirect(rawEndpoint, rawConnection).apply {
+        ReadMode.UNBUFFERED_DIRECT -> UsbDataSourceDirect(rawEndpoint, rawConnection).apply {
             readStatsSource = this
         }
     }.buffer().also {
@@ -48,9 +48,9 @@ class HWEndpoint(
     }
 
     enum class ReadMode {
-        RINGBUFFER,
-        PIPE,
-        DIRECT
+        BUFFERED_NOT_BLOCKING,
+        BUFFERED_BLOCKING,
+        UNBUFFERED_DIRECT
     }
 
     companion object {

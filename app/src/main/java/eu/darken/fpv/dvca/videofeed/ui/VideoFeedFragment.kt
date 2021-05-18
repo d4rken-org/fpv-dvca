@@ -43,7 +43,7 @@ class VideoFeedFragment : SmartFragment(R.layout.videofeed_fragment) {
                 reconnectToast = null
 
                 feedPlayer.start(
-                    source = feed.exoDataSource,
+                    feed = feed,
                     surfaceView = binding.videoCanvas,
                     renderInfoListener = { info -> updateMetaData(info, feed) }
                 )
