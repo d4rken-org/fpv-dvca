@@ -1,4 +1,4 @@
-package eu.darken.fpv.dvca.videofeed.core.player
+package eu.darken.fpv.dvca.videofeed.core.player.exo
 
 data class RenderInfo(
     val frames: Int,

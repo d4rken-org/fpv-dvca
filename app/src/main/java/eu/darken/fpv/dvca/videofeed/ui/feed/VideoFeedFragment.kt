@@ -22,8 +22,8 @@ import eu.darken.fpv.dvca.common.viewbinding.viewBindingLazy
 import eu.darken.fpv.dvca.databinding.VideofeedFragmentBinding
 import eu.darken.fpv.dvca.gear.GearManager
 import eu.darken.fpv.dvca.gear.goggles.Goggles
-import eu.darken.fpv.dvca.videofeed.core.player.ExoFeedPlayer
-import eu.darken.fpv.dvca.videofeed.core.player.RenderInfo
+import eu.darken.fpv.dvca.videofeed.core.player.exo.ExoFeedPlayer
+import eu.darken.fpv.dvca.videofeed.core.player.exo.RenderInfo
 import timber.log.Timber
 import javax.inject.Inject
 

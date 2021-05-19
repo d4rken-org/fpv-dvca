@@ -13,7 +13,7 @@ import eu.darken.fpv.dvca.App
 import eu.darken.fpv.dvca.gear.goggles.Goggles
 import eu.darken.fpv.dvca.usb.connection.HWConnection
 import eu.darken.fpv.dvca.usb.connection.HWEndpoint
-import eu.darken.fpv.dvca.videofeed.core.player.H264Extractor2
+import eu.darken.fpv.dvca.videofeed.core.player.exo.H264Extractor2
 import okio.BufferedSink
 import okio.BufferedSource
 import timber.log.Timber
