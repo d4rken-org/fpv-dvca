@@ -13,3 +13,9 @@ Thank you:
 * D3VL nourishing a nice community
 
 ☕ [Coffee?](https://www.buymeacoffee.com/tydarken)
+
+## Download
+* [GitHub](https://github.com/d4rken/fpv-dvca/releases/latest)
+
+## Screenshots
+<img src="https://raw.githubusercontent.com/d4rken/fpv-dvca/main/.media/screenshot-land.png" width="400"><img src="https://raw.githubusercontent.com/d4rken/fpv-dvca/main/.media/screenshoto-port.png" width="400">
