@@ -2,7 +2,7 @@ package eu.darken.fpv.dvca.gear
 
 import eu.darken.fpv.dvca.usb.HWDevice
 import kotlinx.coroutines.flow.Flow
-import    java.time.Instant
+import java.time.Instant
 
 interface Gear {
     val device: HWDevice
@@ -41,10 +41,7 @@ interface Gear {
     interface Factory {
         fun canHandle(device: HWDevice): Boolean
 
-        fun create(
-            gearManager: GearManager,
-            device: HWDevice,
-        ): Gear
+        fun create(device: HWDevice): Gear
     }
 }
 

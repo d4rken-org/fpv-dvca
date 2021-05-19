@@ -20,7 +20,7 @@ import timber.log.Timber
 
 class FpvGogglesV1VideoFeed(
     private val connection: HWConnection,
-    private val usbReadMode: HWEndpoint.ReadMode,
+    override val usbReadMode: HWEndpoint.ReadMode,
 ) : Goggles.VideoFeed {
     private val intf = connection.getInterface(3)
     private val cmdEndpoint = intf.getEndpoint(0)

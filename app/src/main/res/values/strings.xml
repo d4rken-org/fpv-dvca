@@ -28,4 +28,5 @@
     <string name="feedsettings_subtitle">Defaults and general options</string>
     <string name="feedmode_label">Feed mode</string>
     <string name="feedmode_description">Default option for how the video feed should be consumed. Best mode may differ per device.</string>
+    <string name="msg_restart_for_effect">Restart app for setting to take effect</string>
 </resources>

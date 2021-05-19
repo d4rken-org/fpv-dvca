@@ -1,22 +1,25 @@
 package eu.darken.fpv.dvca.gear.goggles.djifpv
 
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import eu.darken.fpv.dvca.App
 import eu.darken.fpv.dvca.gear.Gear
 import eu.darken.fpv.dvca.gear.GearManager
 import eu.darken.fpv.dvca.gear.goggles.Goggles
 import eu.darken.fpv.dvca.usb.HWDevice
 import eu.darken.fpv.dvca.usb.connection.HWConnection
-import eu.darken.fpv.dvca.usb.connection.HWEndpoint
+import eu.darken.fpv.dvca.videofeed.core.GeneralFeedSettings
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.filterNotNull
 import timber.log.Timber
 import java.time.Instant
-import javax.inject.Inject
 
-class FpvGogglesV1(
+class FpvGogglesV1 @AssistedInject constructor(
+    @Assisted private val initialDevice: HWDevice,
     private val gearManager: GearManager,
-    private val initialDevice: HWDevice,
+    private val generalFeedSettings: GeneralFeedSettings,
 ) : Goggles {
     private var currentDevice: HWDevice? = initialDevice
 
@@ -83,7 +86,7 @@ class FpvGogglesV1(
 
         return FpvGogglesV1VideoFeed(
             connection!!,
-            usbReadMode = HWEndpoint.ReadMode.UNBUFFERED_DIRECT,
+            usbReadMode = generalFeedSettings.feedModeDefault.value,
         ).also { feed ->
             videoFeedInternal.value = feed
         }
@@ -107,18 +110,14 @@ class FpvGogglesV1(
         private const val PRODUCT_ID = 31
     }
 
-    class Factory @Inject constructor() : Gear.Factory {
+
+    @AssistedFactory
+    abstract class Factory : Gear.Factory {
 
         override fun canHandle(device: HWDevice): Boolean = device.rawDevice.run {
             vendorId == VENDOR_ID && productId == PRODUCT_ID
         }
 
-        override fun create(
-            gearManager: GearManager,
-            device: HWDevice
-        ): Goggles = FpvGogglesV1(
-            gearManager = gearManager,
-            initialDevice = device,
-        )
+        abstract override fun create(device: HWDevice): FpvGogglesV1
     }
 }

@@ -139,7 +139,7 @@ class VideoFeedFragment : SmartFragment(R.layout.videofeed_fragment) {
         val sb = StringBuilder(versionTag)
         sb.append(" ")
         sb.append(info.toString())
-        sb.append(" [MB/s USB ${feed.videoUsbReadMbs} | Buffer ${feed.videoBufferReadMbs}]")
+        sb.append(" [MB/s USB ${feed.videoUsbReadMbs} | Buffer ${feed.videoBufferReadMbs} ~ ${feed.usbReadMode}]")
 
         binding.player1Metadata.text = sb.toString()
     }

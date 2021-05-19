@@ -91,7 +91,7 @@ class GearManager @Inject constructor(
             Timber.tag(TAG).i("No gear factory to handle device: %s", this.identifier)
             return null
         }
-        return factory.create(this@GearManager, this).also {
+        return factory.create(this).also {
             Timber.tag(TAG).i("Used %s to create %s", factory, it)
         }
     }

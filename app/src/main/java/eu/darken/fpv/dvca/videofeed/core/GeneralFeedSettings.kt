@@ -9,7 +9,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class VideoFeedSettings @Inject constructor(
+class GeneralFeedSettings @Inject constructor(
     @ApplicationContext private val context: Context,
 ) {
 
