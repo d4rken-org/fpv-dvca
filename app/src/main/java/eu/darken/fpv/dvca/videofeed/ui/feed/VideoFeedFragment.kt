@@ -34,7 +34,9 @@ class VideoFeedFragment : SmartFragment(R.layout.videofeed_fragment) {
     private val vm: VideoFeedVM by viewModels()
     private val binding: VideofeedFragmentBinding by viewBindingLazy()
 
-    @Inject lateinit var feedPlayer: ExoFeedPlayer
+    @Inject lateinit var exoPlayer: ExoFeedPlayer
+
+    //    @Inject lateinit var mediaPlayer: MediaFeedPlayer
     @Inject lateinit var gearManager: GearManager
 
     private var reconnectToast: Snackbar? = null
@@ -93,13 +95,13 @@ class VideoFeedFragment : SmartFragment(R.layout.videofeed_fragment) {
                 reconnectToast?.dismiss()
                 reconnectToast = null
 
-                feedPlayer.start(
+                exoPlayer.start(
                     feed = feed,
                     surfaceView = binding.player1Canvas,
                     renderInfoListener = { info -> updateMetaData(info, feed) }
                 )
             } else {
-                feedPlayer.stop()
+                exoPlayer.stop()
 
                 reconnectToast?.dismiss()
                 Snackbar.make(
@@ -145,7 +147,7 @@ class VideoFeedFragment : SmartFragment(R.layout.videofeed_fragment) {
     }
 
     override fun onDestroyView() {
-        feedPlayer.stop()
+        exoPlayer.stop()
         super.onDestroyView()
     }
 

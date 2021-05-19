@@ -7,13 +7,14 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.android.scopes.FragmentScoped
 import eu.darken.fpv.dvca.App
 import eu.darken.fpv.dvca.gear.goggles.Goggles
+import eu.darken.fpv.dvca.videofeed.core.player.FeedPlayer
 import timber.log.Timber
 import javax.inject.Inject
 
 @FragmentScoped
 class ExoFeedPlayer @Inject constructor(
     @ApplicationContext private val context: Context,
-) {
+) : FeedPlayer {
 
     private val loadControl = DefaultLoadControl.Builder().apply {
         setBufferDurationsMs(100, 1000, 100, 100)
@@ -35,10 +36,10 @@ class ExoFeedPlayer @Inject constructor(
 
     private val renderInfoListeners = mutableListOf<(RenderInfo) -> Unit>()
 
-    val isPlaying: Boolean
+    override val isPlaying: Boolean
         get() = player.run { isPlaying || isLoading }
 
-    fun start(
+    override fun start(
         feed: Goggles.VideoFeed,
         surfaceView: SurfaceView,
         renderInfoListener: (RenderInfo) -> Unit
@@ -72,7 +73,7 @@ class ExoFeedPlayer @Inject constructor(
         }
     }
 
-    fun stop() {
+    override fun stop() {
         Timber.tag(TAG).d("stop()")
         player.apply {
             stop()

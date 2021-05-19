@@ -16,6 +16,7 @@ import eu.darken.fpv.dvca.usb.connection.HWEndpoint
 import eu.darken.fpv.dvca.videofeed.core.player.exo.H264Extractor2
 import okio.BufferedSink
 import okio.BufferedSource
+import okio.Source
 import timber.log.Timber
 
 class FpvGogglesV1VideoFeed(
@@ -28,6 +29,9 @@ class FpvGogglesV1VideoFeed(
     private var cmdSink: BufferedSink? = null
     private var videoSource: BufferedSource? = null
 
+    override val source: Source
+        get() = videoSource!!
+
     override val exoDataSource: DataSource = object : DataSource {
         override fun getUri(): Uri? = Uri.EMPTY
 
@@ -35,29 +39,7 @@ class FpvGogglesV1VideoFeed(
 
         override fun open(dataSpec: DataSpec): Long {
             Timber.tag(TAG).v("open(dataSpec=%s) this=%s", dataSpec, this)
-
-            intf.claim(forced = true)
-
-            val cmdSink = cmdEndpoint.sink()
-            val videoSource = videoEndpoint.source(readMode = usbReadMode)
-
-            try {
-                Timber.tag(TAG).v("Waiting for video feed to start.")
-                val readBytes = videoSource.readByteArray(DEFAULT_FRAME_SIZE)
-                Timber.tag(TAG).v("Video feed has started, we got %d bytes", readBytes.size)
-            } catch (e: Exception) {
-                // java.io.InterruptedIOException: timeout ?
-                Timber.tag(TAG).v(e, "Failed to open video feed, needs magic packet.")
-
-                cmdSink.apply {
-                    Timber.tag(TAG).d("Writing new magic packet.")
-                    write(MAGIC_FPVOUT_PACKET)
-                    flush()
-                }
-            }
-
-            this@FpvGogglesV1VideoFeed.cmdSink = cmdSink
-            this@FpvGogglesV1VideoFeed.videoSource = videoSource
+            this@FpvGogglesV1VideoFeed.open()
 
             return if (dataSpec.length != C.LENGTH_UNSET.toLong()) {
                 dataSpec.length
@@ -72,10 +54,7 @@ class FpvGogglesV1VideoFeed(
 
         override fun close() {
             Timber.tag(TAG).d("close(), source, this=%s", this)
-            cmdSink?.close()
-            cmdSink = null
-            videoSource?.close()
-            videoSource = null
+            this@FpvGogglesV1VideoFeed.close()
         }
     }
 
@@ -101,9 +80,38 @@ class FpvGogglesV1VideoFeed(
     override val videoBufferReadMbs: Double
         get() = videoEndpoint.readStats.bufferReadMbs
 
+    override fun open() {
+        intf.claim(forced = true)
+
+        val cmdSink = cmdEndpoint.sink()
+        val videoSource = videoEndpoint.source(readMode = usbReadMode)
+
+        try {
+            Timber.tag(TAG).v("Waiting for video feed to start.")
+            val readBytes = videoSource.readByteArray(DEFAULT_FRAME_SIZE)
+            Timber.tag(TAG).v("Video feed has started, we got %d bytes", readBytes.size)
+        } catch (e: Exception) {
+            // java.io.InterruptedIOException: timeout ?
+            Timber.tag(TAG).v(e, "Failed to open video feed, needs magic packet.")
+
+            cmdSink.apply {
+                Timber.tag(TAG).d("Writing new magic packet.")
+                write(MAGIC_FPVOUT_PACKET)
+                flush()
+            }
+        }
+
+        this@FpvGogglesV1VideoFeed.cmdSink = cmdSink
+        this@FpvGogglesV1VideoFeed.videoSource = videoSource
+    }
+
     override fun close() {
         Timber.tag(TAG).v("close() feed, this=%s", this)
-        exoDataSource.close()
+        cmdSink?.close()
+        cmdSink = null
+        videoSource?.close()
+        videoSource = null
+
         intf.release()
     }
 
