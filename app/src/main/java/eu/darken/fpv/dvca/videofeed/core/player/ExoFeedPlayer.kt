@@ -2,9 +2,7 @@ package eu.darken.fpv.dvca.videofeed.core.player
 
 import android.content.Context
 import android.view.SurfaceView
-import com.google.android.exoplayer2.C
-import com.google.android.exoplayer2.DefaultLoadControl
-import com.google.android.exoplayer2.SimpleExoPlayer
+import com.google.android.exoplayer2.*
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.android.scopes.FragmentScoped
 import eu.darken.fpv.dvca.App
@@ -13,16 +11,12 @@ import timber.log.Timber
 import javax.inject.Inject
 
 @FragmentScoped
-class FPVFeedPlayer @Inject constructor(
+class ExoFeedPlayer @Inject constructor(
     @ApplicationContext private val context: Context,
 ) {
 
     private val loadControl = DefaultLoadControl.Builder().apply {
-        setBufferDurationsMs(1, 20000, 1, 1)
-//        setTargetBufferBytes(0)
-//        setBackBuffer(50, true)
-//        setPrioritizeTimeOverSizeThresholds(true)
-//        setAllocator(DefaultAllocator(true,512))
+        setBufferDurationsMs(100, 1000, 100, 100)
     }.build()
 
     private val renderersFactory = CustomRendererFactory(
@@ -63,6 +57,15 @@ class FPVFeedPlayer @Inject constructor(
         player.apply {
             setVideoSurfaceView(surfaceView)
             setMediaSource(feed.exoMediaSource)
+
+            addListener(object : Player.Listener {
+                override fun onPlayerError(error: ExoPlaybackException) {
+                    Timber.tag(TAG).w(error, "Playback error")
+                    player.stop()
+                    player.prepare()
+                    player.play()
+                }
+            })
 
             prepare()
             play()

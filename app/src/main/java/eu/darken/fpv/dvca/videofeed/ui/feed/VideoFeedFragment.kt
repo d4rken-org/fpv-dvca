@@ -22,7 +22,7 @@ import eu.darken.fpv.dvca.common.viewbinding.viewBindingLazy
 import eu.darken.fpv.dvca.databinding.VideofeedFragmentBinding
 import eu.darken.fpv.dvca.gear.GearManager
 import eu.darken.fpv.dvca.gear.goggles.Goggles
-import eu.darken.fpv.dvca.videofeed.core.player.FPVFeedPlayer
+import eu.darken.fpv.dvca.videofeed.core.player.ExoFeedPlayer
 import eu.darken.fpv.dvca.videofeed.core.player.RenderInfo
 import timber.log.Timber
 import javax.inject.Inject
@@ -34,7 +34,7 @@ class VideoFeedFragment : SmartFragment(R.layout.videofeed_fragment) {
     private val vm: VideoFeedVM by viewModels()
     private val binding: VideofeedFragmentBinding by viewBindingLazy()
 
-    @Inject lateinit var feedPlayer: FPVFeedPlayer
+    @Inject lateinit var feedPlayer: ExoFeedPlayer
     @Inject lateinit var gearManager: GearManager
 
     private var reconnectToast: Snackbar? = null

@@ -18,10 +18,10 @@ class UsbDataSourceBuffered(
 
     private val pipe = Pipe(16 * 1024 * 1024)
     private val source = pipe.source.also {
-        timeout().timeout(200, TimeUnit.MILLISECONDS)
+        timeout().timeout(500, TimeUnit.MILLISECONDS)
     }
     private val sink = pipe.sink.buffer().also {
-        timeout().timeout(200, TimeUnit.MILLISECONDS)
+        timeout().timeout(500, TimeUnit.MILLISECONDS)
     }
 
     private var open = true
@@ -49,7 +49,7 @@ class UsbDataSourceBuffered(
                     sender,
                     transferBuffer,
                     readSize,
-                    100
+                    200
                 )
 
                 if (receivedBytes > 0) {
@@ -101,7 +101,7 @@ class UsbDataSourceBuffered(
 
     override fun cursor(): Cursor? = source.cursor()
 
-    override fun timeout(): Timeout = pipe.source.timeout()
+    override fun timeout(): Timeout = pipe.source.timeout().timeout(5, TimeUnit.SECONDS)
 
     override fun close() {
         Timber.tag(TAG).v("close()")

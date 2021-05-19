@@ -119,7 +119,7 @@ class FpvGogglesV1VideoFeed(
          * Random thought: Max frame size is correlated to sample time, higher sample time, smaller frame buffer?
          */
 
-        private const val DEFAULT_FRAME_SIZE = 131072L
+        internal const val DEFAULT_FRAME_SIZE = 131072L
         private const val DEFAULT_SAMPLE_TIME = 500L
 
         /**

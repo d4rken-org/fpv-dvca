@@ -162,7 +162,7 @@ class AndroidUSBInputStream2(
     }
 
     companion object {
-        private const val READ_TIMEOUT = 100
+        private const val READ_TIMEOUT = 200
         private val TAG = App.logTag("Usb", "AndroidUSBInputStream2")
     }
 }
