@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
-    app:startDestination="@id/onboardingFragment">
+    app:startDestination="@id/videoFeedFragment">
     <fragment
         android:id="@+id/videoFeedFragment"
         android:name="eu.darken.fpv.dvca.videofeed.ui.feed.VideoFeedFragment"
@@ -15,6 +15,9 @@
         <action
             android:id="@+id/action_videoFeedFragment_to_infoFragment"
             app:destination="@id/infoFragment" />
+        <action
+            android:id="@+id/action_videoFeedFragment_to_onboardingFragment"
+            app:destination="@id/onboardingFragment" />
     </fragment>
 
     <fragment
@@ -24,9 +27,9 @@
         tools:layout="@layout/onboarding_fragment">
         <action
             android:id="@+id/action_onboardingFragment_to_videoFeedFragment"
-            app:destination="@id/videoFeedFragment"
             app:popUpTo="@id/onboardingFragment"
-            app:popUpToInclusive="true" />
+            app:popUpToInclusive="true"
+            app:destination="@id/videoFeedFragment" />
     </fragment>
     <fragment
         android:id="@+id/infoFragment"

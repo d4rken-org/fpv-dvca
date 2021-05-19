@@ -5,10 +5,8 @@ import android.view.MenuItem
 import androidx.activity.viewModels
 import androidx.navigation.findNavController
 import androidx.navigation.ui.NavigationUI
-import androidx.navigation.ui.setupActionBarWithNavController
 import dagger.hilt.android.AndroidEntryPoint
 import eu.darken.fpv.dvca.R
-import eu.darken.fpv.dvca.common.navigation.isGraphSet
 import eu.darken.fpv.dvca.common.smart.SmartActivity
 
 @AndroidEntryPoint
@@ -23,16 +21,8 @@ class MainActivity : SmartActivity() {
 
         setContentView(R.layout.main_activity)
 
-        vm.navStartEvent.observe(this) { navInit ->
-            if (navController.isGraphSet()) return@observe
-
-            val graph = navController.navInflater.inflate(R.navigation.main).apply {
-                startDestination = when (navInit.showOnboarding) {
-                    true -> R.id.onboardingFragment
-                    false -> R.id.videoFeedFragment
-                }
-            }
-            navController.graph = graph
+        if (!vm.hasOnboarding.value) {
+            navController.navigate(R.id.onboardingFragment)
         }
     }
 
