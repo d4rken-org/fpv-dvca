@@ -1,4 +1,4 @@
-package eu.darken.fpv.dvca.videofeed.ui
+package eu.darken.fpv.dvca.videofeed.ui.feed
 
 import androidx.lifecycle.SavedStateHandle
 import dagger.hilt.android.lifecycle.HiltViewModel

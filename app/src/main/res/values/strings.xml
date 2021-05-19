@@ -1,6 +1,5 @@
 <resources>
     <string name="app_name_short">DVCA</string>
-    <string name="label_settings">Settings</string>
     <string name="label_help">Help</string>
     <string name="label_example_fragment">Example Fragment</string>
     <string name="label_another_fragment">Another Fragment</string>
@@ -14,4 +13,19 @@
     <string name="app_name_long">Digital Video Companion App</string>
     <string name="status_message_waiting_for_device">Waiting for USB device</string>
     <string name="video_feed_player_tease">Ready player %s?</string>
+    <string name="label_settings">Settings</string>
+    <string name="label_info">Info</string>
+    <string name="label_donate">Donate</string>
+    <string name="label_open_source">Source code</string>
+    <string name="description_open_source">This app is open source.</string>
+    <string name="fpvout_discord_label">FPV Out Discord</string>
+    <string name="fpvout_discord_description">Come and chat with likeminded pilots.</string>
+    <string name="info_screen_label">Info</string>
+    <string name="info_screen_description">Additional resources and links.</string>
+    <string name="author_twitter_label">\@d4rken</string>
+    <string name="author_twitter_description">https://twitter.com/d4rken</string>
+    <string name="feedsettings_label">Video feed settings</string>
+    <string name="feedsettings_subtitle">Defaults and general options</string>
+    <string name="feedmode_label">Feed mode</string>
+    <string name="feedmode_description">Default option for how the video feed should be consumed. Best mode may differ per device.</string>
 </resources>

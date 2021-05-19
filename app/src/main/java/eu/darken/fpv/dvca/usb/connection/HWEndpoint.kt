@@ -47,10 +47,10 @@ class HWEndpoint(
         Timber.tag(TAG).v("source(readMode=$readMode) created: %s", it)
     }
 
-    enum class ReadMode {
-        BUFFERED_NOT_BLOCKING,
-        BUFFERED_BLOCKING,
-        UNBUFFERED_DIRECT
+    enum class ReadMode(val key: String) {
+        BUFFERED_NOT_BLOCKING("buffered_not_blocking"),
+        BUFFERED_BLOCKING("buffered_blocking"),
+        UNBUFFERED_DIRECT("unbuffered_direct")
     }
 
     companion object {

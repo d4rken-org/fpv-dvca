@@ -1,0 +1,4 @@
+<resources>
+    <dimen name="padding_16dp">16dp</dimen>
+    <dimen name="padding_8dp">16dp</dimen>
+</resources>

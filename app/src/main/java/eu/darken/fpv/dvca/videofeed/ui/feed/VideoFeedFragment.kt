@@ -1,6 +1,8 @@
-package eu.darken.fpv.dvca.videofeed.ui
+package eu.darken.fpv.dvca.videofeed.ui.feed
 
+import android.content.Intent
 import android.content.res.Configuration
+import android.net.Uri
 import android.os.Bundle
 import android.view.View
 import androidx.core.view.isGone
@@ -12,6 +14,7 @@ import eu.darken.fpv.dvca.App
 import eu.darken.fpv.dvca.R
 import eu.darken.fpv.dvca.common.BuildConfigWrap
 import eu.darken.fpv.dvca.common.hideSystemUI
+import eu.darken.fpv.dvca.common.navigation.doNavigate
 import eu.darken.fpv.dvca.common.observe2
 import eu.darken.fpv.dvca.common.showSystemUI
 import eu.darken.fpv.dvca.common.smart.SmartFragment
@@ -19,8 +22,8 @@ import eu.darken.fpv.dvca.common.viewbinding.viewBindingLazy
 import eu.darken.fpv.dvca.databinding.VideofeedFragmentBinding
 import eu.darken.fpv.dvca.gear.GearManager
 import eu.darken.fpv.dvca.gear.goggles.Goggles
-import eu.darken.fpv.dvca.videofeed.core.FPVFeedPlayer
-import eu.darken.fpv.dvca.videofeed.core.RenderInfo
+import eu.darken.fpv.dvca.videofeed.core.player.FPVFeedPlayer
+import eu.darken.fpv.dvca.videofeed.core.player.RenderInfo
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -40,10 +43,6 @@ class VideoFeedFragment : SmartFragment(R.layout.videofeed_fragment) {
         "DVCA ${BuildConfigWrap.VERSION_NAME}(${BuildConfigWrap.GITSHA})"
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setHasOptionsMenu(true)
-    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -55,6 +54,25 @@ class VideoFeedFragment : SmartFragment(R.layout.videofeed_fragment) {
         binding.apply {
             root.setOnClickListener {
                 if (toolbar.isGone) exitImmersive() else enterImmersive()
+            }
+            toolbar.inflateMenu(R.menu.feed_general_menu)
+            toolbar.setOnMenuItemClickListener {
+                when (it.itemId) {
+                    R.id.settings -> {
+                        doNavigate(VideoFeedFragmentDirections.actionVideoFeedFragmentToSettingsFragment())
+                        true
+                    }
+                    R.id.info -> {
+                        doNavigate(VideoFeedFragmentDirections.actionVideoFeedFragmentToInfoFragment())
+                        true
+                    }
+                    R.id.donate -> {
+                        Intent(Intent.ACTION_VIEW, Uri.parse("https://www.buymeacoffee.com/tydarken"))
+                            .run { startActivity(this) }
+                        true
+                    }
+                    else -> super.onOptionsItemSelected(it)
+                }
             }
         }
 

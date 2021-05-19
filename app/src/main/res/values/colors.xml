@@ -9,4 +9,6 @@
     <color name="secondary">#ffea00</color>
     <color name="secondaryLight">#ffff56</color>
     <color name="secondaryDark">#c7b800</color>
+
+    <color name="colorOnBackground">@color/black</color>
 </resources>
