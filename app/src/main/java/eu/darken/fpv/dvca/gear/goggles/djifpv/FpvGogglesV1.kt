@@ -1,8 +1,10 @@
 package eu.darken.fpv.dvca.gear.goggles.djifpv
 
+import android.content.Context
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
+import dagger.hilt.android.qualifiers.ApplicationContext
 import eu.darken.fpv.dvca.App
 import eu.darken.fpv.dvca.gear.Gear
 import eu.darken.fpv.dvca.gear.GearManager
@@ -18,6 +20,7 @@ import java.time.Instant
 
 class FpvGogglesV1 @AssistedInject constructor(
     @Assisted private val initialDevice: HWDevice,
+    @ApplicationContext private val context: Context,
     private val gearManager: GearManager,
     private val generalFeedSettings: GeneralFeedSettings,
 ) : Goggles {
@@ -85,6 +88,7 @@ class FpvGogglesV1 @AssistedInject constructor(
         connection = device.openConnection()
 
         return FpvGogglesV1VideoFeed(
+            context,
             connection!!,
             usbReadMode = generalFeedSettings.feedModeDefault.value,
         ).also { feed ->

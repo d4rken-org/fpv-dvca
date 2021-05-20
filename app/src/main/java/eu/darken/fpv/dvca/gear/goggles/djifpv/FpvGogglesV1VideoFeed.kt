@@ -1,5 +1,6 @@
 package eu.darken.fpv.dvca.gear.goggles.djifpv
 
+import android.content.Context
 import android.net.Uri
 import com.google.android.exoplayer2.C
 import com.google.android.exoplayer2.MediaItem
@@ -14,12 +15,11 @@ import eu.darken.fpv.dvca.gear.goggles.Goggles
 import eu.darken.fpv.dvca.usb.connection.HWConnection
 import eu.darken.fpv.dvca.usb.connection.HWEndpoint
 import eu.darken.fpv.dvca.videofeed.core.player.exo.H264Extractor2
-import okio.BufferedSink
-import okio.BufferedSource
-import okio.Source
+import okio.*
 import timber.log.Timber
 
 class FpvGogglesV1VideoFeed(
+    private val context: Context,
     private val connection: HWConnection,
     override val usbReadMode: HWEndpoint.ReadMode,
 ) : Goggles.VideoFeed {
