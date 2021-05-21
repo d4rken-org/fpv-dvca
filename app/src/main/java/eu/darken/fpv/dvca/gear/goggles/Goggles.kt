@@ -25,6 +25,8 @@ interface Goggles : Gear {
         val videoUsbReadMbs: Double
         val videoBufferReadMbs: Double
 
+        val deviceIdentifier: String
+
         fun open()
 
         fun close()

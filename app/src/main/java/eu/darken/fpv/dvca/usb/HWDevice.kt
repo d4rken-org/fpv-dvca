@@ -14,15 +14,11 @@ class HWDevice(
 ) {
     private val mutex = Mutex()
     private var storedSerial: String? = null
-    val serialNumber: SerialNumber?
-        get() {
-            val number = storedSerial ?: try {
-                rawDevice.serialNumber?.also { storedSerial = it }
-            } catch (e: SecurityException) {
-                null
-            }
-
-            return number?.let { SerialNumber(it) }
+    val serialNumber: String?
+        get() = storedSerial ?: try {
+            rawDevice.serialNumber?.also { storedSerial = it }
+        } catch (e: SecurityException) {
+            null
         }
 
     val identifier: String
@@ -55,7 +51,4 @@ class HWDevice(
     companion object {
         private val TAG = App.logTag("Usb", "Device")
     }
-
-    @JvmInline
-    value class SerialNumber(val serialNumber: String)
 }

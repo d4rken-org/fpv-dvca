@@ -4,17 +4,17 @@ import android.content.Context
 import android.view.SurfaceView
 import com.google.android.exoplayer2.*
 import dagger.hilt.android.qualifiers.ApplicationContext
-import dagger.hilt.android.scopes.FragmentScoped
 import eu.darken.fpv.dvca.App
 import eu.darken.fpv.dvca.gear.goggles.Goggles
 import eu.darken.fpv.dvca.videofeed.core.player.FeedPlayer
 import timber.log.Timber
 import javax.inject.Inject
 
-@FragmentScoped
 class ExoFeedPlayer @Inject constructor(
     @ApplicationContext private val context: Context,
 ) : FeedPlayer {
+
+    private val tag = App.logTag("Video", "Player", hashCode().toString())
 
     private val loadControl = DefaultLoadControl.Builder().apply {
         setBufferDurationsMs(100, 1000, 100, 100)
@@ -44,10 +44,10 @@ class ExoFeedPlayer @Inject constructor(
         surfaceView: SurfaceView,
         renderInfoListener: (RenderInfo) -> Unit
     ) {
-        Timber.tag(TAG).d("start(source=%s, view=%s)", feed, surfaceView)
+        Timber.tag(tag).d("start(source=%s, view=%s)", feed, surfaceView)
 
         if (isPlaying) {
-            Timber.tag(TAG).w("Already playing? Stopping!")
+            Timber.tag(tag).w("Already playing? Stopping!")
             stop()
         }
 
@@ -61,7 +61,7 @@ class ExoFeedPlayer @Inject constructor(
 
             addListener(object : Player.Listener {
                 override fun onPlayerError(error: ExoPlaybackException) {
-                    Timber.tag(TAG).w(error, "Playback error")
+                    Timber.tag(tag).w(error, "Playback error")
                     player.stop()
                     player.prepare()
                     player.play()
@@ -74,15 +74,11 @@ class ExoFeedPlayer @Inject constructor(
     }
 
     override fun stop() {
-        Timber.tag(TAG).d("stop()")
+        Timber.tag(tag).d("stop()")
         player.apply {
             stop()
             clearMediaItems()
         }
         renderInfoListeners.clear()
-    }
-
-    companion object {
-        private val TAG = App.logTag("Video", "Player")
     }
 }

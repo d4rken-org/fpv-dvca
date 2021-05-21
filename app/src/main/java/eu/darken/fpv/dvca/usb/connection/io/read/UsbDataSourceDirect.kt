@@ -16,6 +16,7 @@ class UsbDataSourceDirect(
     private val connection: UsbDeviceConnection,
 ) : Source, HasUsbStats {
 
+    private val tag = App.logTag("Usb", "UsbDataSourceDirect", this.hashCode().toString())
     private var bufferBytesRead = 0L
     private var bufferBytesLast = SystemClock.elapsedRealtime()
     private val transferBuffer = ByteArray(131072)
@@ -37,7 +38,7 @@ class UsbDataSourceDirect(
 
             bufferBytesLast = nowMs
             bufferBytesRead = 0L
-            Timber.tag(TAG).v("Reading $mbPerSecond MB/s from buffer")
+            Timber.tag(tag).v("Reading $mbPerSecond MB/s from buffer")
 
             usbReadRate = mbPerSecond
         }
@@ -50,11 +51,7 @@ class UsbDataSourceDirect(
     override fun timeout(): Timeout = Timeout.NONE
 
     override fun close() {
-        Timber.tag(TAG).v("close()")
+        Timber.tag(tag).v("close()")
         usbReadRate = -1.0
-    }
-
-    companion object {
-        private val TAG = App.logTag("Usb", "UsbDataSourceDirect")
     }
 }

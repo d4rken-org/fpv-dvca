@@ -10,9 +10,9 @@ interface Gear {
     val firstSeenAt: Instant
 
     val identifier: String
-        get() = device.identifier
+        get() = "${device.identifier}#$gearName"
 
-    val serialNumber: HWDevice.SerialNumber?
+    val serialNumber: String?
         get() = device.serialNumber
 
     val label: String
@@ -24,7 +24,7 @@ interface Gear {
     val isGearConnected: Boolean
 
     val logId: String
-        get() = "$serialNumber § $identifier $gearName"
+        get() = "$identifier $gearName"
 
     val events: Flow<Event>
 

@@ -23,6 +23,8 @@ class FpvGogglesV1VideoFeed(
     private val connection: HWConnection,
     override val usbReadMode: HWEndpoint.ReadMode,
 ) : Goggles.VideoFeed {
+    private val tag = App.logTag("Gear", "FpvGogglesV1", "VideoFeed", hashCode().toString())
+
     private val intf = connection.getInterface(3)
     private val cmdEndpoint = intf.getEndpoint(0)
     private val videoEndpoint = intf.getEndpoint(1)
@@ -32,13 +34,16 @@ class FpvGogglesV1VideoFeed(
     override val source: Source
         get() = videoSource!!
 
+    override val deviceIdentifier: String
+        get() = connection.deviceIdentifier
+
     override val exoDataSource: DataSource = object : DataSource {
         override fun getUri(): Uri? = Uri.EMPTY
 
         override fun addTransferListener(transferListener: TransferListener) {}
 
         override fun open(dataSpec: DataSpec): Long {
-            Timber.tag(TAG).v("open(dataSpec=%s) this=%s", dataSpec, this)
+            Timber.tag(tag).v("open(dataSpec=%s) this=%s", dataSpec, this)
             this@FpvGogglesV1VideoFeed.open()
 
             return if (dataSpec.length != C.LENGTH_UNSET.toLong()) {
@@ -53,7 +58,7 @@ class FpvGogglesV1VideoFeed(
         }
 
         override fun close() {
-            Timber.tag(TAG).d("close(), source, this=%s", this)
+            Timber.tag(tag).d("close(), source, this=%s", this)
             this@FpvGogglesV1VideoFeed.close()
         }
     }
@@ -81,21 +86,21 @@ class FpvGogglesV1VideoFeed(
         get() = videoEndpoint.readStats.bufferReadMbs
 
     override fun open() {
-        intf.claim(forced = true)
+        intf.claim(forced = false)
 
         val cmdSink = cmdEndpoint.sink()
         val videoSource = videoEndpoint.source(readMode = usbReadMode)
 
         try {
-            Timber.tag(TAG).v("Waiting for video feed to start.")
+            Timber.tag(tag).v("Waiting for video feed to start.")
             val readBytes = videoSource.readByteArray(DEFAULT_FRAME_SIZE)
-            Timber.tag(TAG).v("Video feed has started, we got %d bytes", readBytes.size)
+            Timber.tag(tag).v("Video feed has started, we got %d bytes", readBytes.size)
         } catch (e: Exception) {
             // java.io.InterruptedIOException: timeout ?
-            Timber.tag(TAG).v(e, "Failed to open video feed, needs magic packet.")
+            Timber.tag(tag).v(e, "Failed to open video feed, needs magic packet.")
 
             cmdSink.apply {
-                Timber.tag(TAG).d("Writing new magic packet.")
+                Timber.tag(tag).d("Writing new magic packet.")
                 write(MAGIC_FPVOUT_PACKET)
                 flush()
             }
@@ -106,7 +111,7 @@ class FpvGogglesV1VideoFeed(
     }
 
     override fun close() {
-        Timber.tag(TAG).v("close() feed, this=%s", this)
+        Timber.tag(tag).v("close() feed, this=%s", this)
         cmdSink?.close()
         cmdSink = null
         videoSource?.close()
@@ -115,9 +120,11 @@ class FpvGogglesV1VideoFeed(
         intf.release()
     }
 
-    companion object {
-        private val TAG = App.logTag("Gear", "FpvGogglesV1", "VideoFeed")
+    override fun toString(): String {
+        return "VideoFeed(identifier=${connection.deviceIdentifier}, mode=$usbReadMode)"
+    }
 
+    companion object {
         private val MAGIC_FPVOUT_PACKET = "RMVT".toByteArray()
 
         /**

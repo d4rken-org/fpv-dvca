@@ -34,7 +34,8 @@ class VideoFeedFragment : SmartFragment(R.layout.videofeed_fragment) {
     private val vm: VideoFeedVM by viewModels()
     private val binding: VideofeedFragmentBinding by viewBindingLazy()
 
-    @Inject lateinit var exoPlayer: ExoFeedPlayer
+    @Inject lateinit var exoPlayer1: ExoFeedPlayer
+    @Inject lateinit var exoPlayer2: ExoFeedPlayer
 
     //    @Inject lateinit var mediaPlayer: MediaFeedPlayer
     @Inject lateinit var gearManager: GearManager
@@ -81,6 +82,39 @@ class VideoFeedFragment : SmartFragment(R.layout.videofeed_fragment) {
         // Player 1
         binding.apply {
             player1Placeholder.text = getString(R.string.video_feed_player_tease, "1")
+
+            vm.google1Feed.observe2(this@VideoFeedFragment) { feed ->
+                if (feed != null) {
+                    reconnectToast?.dismiss()
+                    reconnectToast = null
+
+                    exoPlayer1.start(
+                        feed = feed,
+                        surfaceView = player1Canvas,
+                        renderInfoListener = { info ->
+                            if (!isResumed) {
+                                Timber.tag(TAG).v("View was null?")
+                                return@start
+                            }
+                            binding.player1Metadata.text = createMetaDataDesc(info, feed)
+                        }
+                    )
+                } else {
+                    exoPlayer1.stop()
+
+                    reconnectToast?.dismiss()
+                    Snackbar.make(
+                        requireView(),
+                        getString(R.string.status_message_waiting_for_device),
+                        Snackbar.LENGTH_INDEFINITE
+                    ).also {
+                        reconnectToast = it
+                    }.show()
+                }
+                player1Placeholder.isGone = feed != null
+                player1Canvas.isInvisible = feed == null
+                player1Metadata.isInvisible = feed == null
+            }
         }
 
         // Player 2
@@ -88,34 +122,41 @@ class VideoFeedFragment : SmartFragment(R.layout.videofeed_fragment) {
             player2Container.isGone = isInLandscape
 
             player2Placeholder.text = getString(R.string.video_feed_player_tease, "2")
-        }
 
-        vm.feedAvailability.observe2(this) { feed ->
-            if (feed != null) {
-                reconnectToast?.dismiss()
-                reconnectToast = null
+            vm.google2Feed.observe2(this@VideoFeedFragment) { feed ->
+                if (feed != null) {
+                    reconnectToast?.dismiss()
+                    reconnectToast = null
 
-                exoPlayer.start(
-                    feed = feed,
-                    surfaceView = binding.player1Canvas,
-                    renderInfoListener = { info -> updateMetaData(info, feed) }
-                )
-            } else {
-                exoPlayer.stop()
+                    exoPlayer2.start(
+                        feed = feed,
+                        surfaceView = player2Canvas,
+                        renderInfoListener = { info ->
+                            if (!isResumed) {
+                                Timber.tag(TAG).v("View was null?")
+                                return@start
+                            }
+                            binding.player2Metadata.text = createMetaDataDesc(info, feed)
+                        }
+                    )
+                } else {
+                    exoPlayer2.stop()
 
-                reconnectToast?.dismiss()
-                Snackbar.make(
-                    requireView(),
-                    getString(R.string.status_message_waiting_for_device),
-                    Snackbar.LENGTH_INDEFINITE
-                ).also {
-                    reconnectToast = it
-                }.show()
+                    reconnectToast?.dismiss()
+                    Snackbar.make(
+                        requireView(),
+                        getString(R.string.status_message_waiting_for_device),
+                        Snackbar.LENGTH_INDEFINITE
+                    ).also {
+                        reconnectToast = it
+                    }.show()
+                }
+                player2Placeholder.isGone = feed != null
+                player2Canvas.isInvisible = feed == null
+                player2Metadata.isInvisible = feed == null
             }
-            binding.player1Placeholder.isGone = feed != null
-            binding.player1Canvas.isInvisible = feed == null
-            binding.player1Metadata.isInvisible = feed == null
         }
+
     }
 
     private fun enterImmersive() {
@@ -132,22 +173,18 @@ class VideoFeedFragment : SmartFragment(R.layout.videofeed_fragment) {
         }
     }
 
-    private fun updateMetaData(info: RenderInfo, feed: Goggles.VideoFeed) {
-        if (view == null) {
-            Timber.tag(TAG).v("View was null?")
-            return
-        }
-
-        val sb = StringBuilder(versionTag)
+    private fun createMetaDataDesc(info: RenderInfo, feed: Goggles.VideoFeed): String {
+        val sb = StringBuilder(feed.deviceIdentifier)
         sb.append(" ")
         sb.append(info.toString())
         sb.append(" [MB/s USB ${feed.videoUsbReadMbs} | Buffer ${feed.videoBufferReadMbs} ~ ${feed.usbReadMode}]")
+        sb.append(" $versionTag")
 
-        binding.player1Metadata.text = sb.toString()
+        return sb.toString()
     }
 
     override fun onDestroyView() {
-        exoPlayer.stop()
+        exoPlayer1.stop()
         super.onDestroyView()
     }
 

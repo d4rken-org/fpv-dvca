@@ -16,6 +16,8 @@ class UsbDataSourceBuffered(
     private val connection: UsbDeviceConnection,
 ) : Source, HasUsbStats {
 
+    private val tag = App.logTag("Usb", "UsbDataSourceBuffered", this.hashCode().toString())
+
     private val pipe = Pipe(16 * 1024 * 1024)
     private val source = pipe.source.also {
         timeout().timeout(500, TimeUnit.MILLISECONDS)
@@ -36,7 +38,7 @@ class UsbDataSourceBuffered(
 
     init {
         thread {
-            Timber.tag(TAG).d("Read worker starting...")
+            Timber.tag(tag).d("Read worker starting...")
 
             val readSize = sender.maxPacketSize * 3
             val transferBuffer = ByteArray(readSize)
@@ -57,7 +59,7 @@ class UsbDataSourceBuffered(
                         sink.write(transferBuffer, 0, receivedBytes)
                         sink.emit()
                     } catch (e: InterruptedIOException) {
-                        Timber.tag(TAG).w(e, "Buffer is full.")
+                        Timber.tag(tag).w(e, "Buffer is full.")
                     }
                 }
 
@@ -69,12 +71,12 @@ class UsbDataSourceBuffered(
 
                     lastRead = nowMs
                     bytesRead = 0L
-                    Timber.tag(TAG).v("Reading $mbPerSecond MB/s from USB")
+                    Timber.tag(tag).v("Reading $mbPerSecond MB/s from USB")
 
                     usbReadRate = mbPerSecond
                 }
             }
-            Timber.tag(TAG).w("Read worker quit...")
+            Timber.tag(tag).w("Read worker quit...")
             sink.close()
             usbReadRate = -1.0
             bufferReadRate = -1.0
@@ -93,7 +95,7 @@ class UsbDataSourceBuffered(
 
             bufferBytesLast = nowMs
             bufferBytesRead = 0L
-            Timber.tag(TAG).v("Reading $mbPerSecond MB/s from buffer")
+            Timber.tag(tag).v("Reading $mbPerSecond MB/s from buffer")
 
             bufferReadRate = mbPerSecond
         }
@@ -104,11 +106,7 @@ class UsbDataSourceBuffered(
     override fun timeout(): Timeout = pipe.source.timeout().timeout(5, TimeUnit.SECONDS)
 
     override fun close() {
-        Timber.tag(TAG).v("close()")
+        Timber.tag(tag).v("close()")
         open = false
-    }
-
-    companion object {
-        private val TAG = App.logTag("Usb", "UsbDataSourceBuffered")
     }
 }

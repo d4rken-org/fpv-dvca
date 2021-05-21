@@ -45,6 +45,8 @@ class AndroidUSBInputStream2(
     private val usbConnection: UsbDeviceConnection,
 ) : InputStream(), HasUsbStats {
 
+    private val tag = App.logTag("Usb", "AndroidUSBInputStream2", this.hashCode().toString())
+
     private var open = true
     private var readBuffer: CircularByteBuffer = CircularByteBuffer(32 * 1024 * 1024)
 
@@ -78,7 +80,7 @@ class AndroidUSBInputStream2(
                     usbReadRate = mbPerSecond
                     lastRead = nowMs
                     bytesRead = 0L
-                    Timber.tag(TAG).v("Reading $mbPerSecond MB/s from USB")
+                    Timber.tag(tag).v("Reading $mbPerSecond MB/s from USB")
                 }
             }
             usbReadRate = -1.0
@@ -128,7 +130,7 @@ class AndroidUSBInputStream2(
 
                 bufferBytesLast = nowMs
                 bufferBytesRead = 0L
-                Timber.tag(TAG).v("Reading $mbPerSecond MB/s from buffer")
+                Timber.tag(tag).v("Reading $mbPerSecond MB/s from buffer")
 
                 bufferReadRate = mbPerSecond
             }
@@ -163,6 +165,5 @@ class AndroidUSBInputStream2(
 
     companion object {
         private const val READ_TIMEOUT = 200
-        private val TAG = App.logTag("Usb", "AndroidUSBInputStream2")
     }
 }
