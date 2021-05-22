@@ -49,7 +49,7 @@ class AndroidUSBInputStream2(
     private val tag = App.logTag("Usb", "AndroidUSBInputStream2", connection.deviceIdentifier)
 
     private var open = true
-    private var readBuffer: CircularByteBuffer = CircularByteBuffer(32 * 1024 * 1024)
+    private var readBuffer: CircularByteBuffer = CircularByteBuffer(16 * 1024 * 1024)
 
     private var usbReadRate: Double = 0.0
     override val usbReadMbs: Double

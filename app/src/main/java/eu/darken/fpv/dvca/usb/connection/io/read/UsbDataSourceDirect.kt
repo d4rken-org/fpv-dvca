@@ -19,7 +19,7 @@ class UsbDataSourceDirect(
     private val tag = App.logTag("Usb", "UsbDataSourceDirect", connection.deviceIdentifier)
     private var bufferBytesRead = 0L
     private var bufferBytesLast = SystemClock.elapsedRealtime()
-    private val transferBuffer = ByteArray(131072)
+    private val transferBuffer = ByteArray(2 * 131072)
 
     private var usbReadRate: Double = -1.0
     override val usbReadMbs: Double

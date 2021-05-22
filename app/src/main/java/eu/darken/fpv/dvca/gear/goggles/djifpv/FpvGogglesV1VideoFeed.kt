@@ -67,9 +67,9 @@ class FpvGogglesV1VideoFeed(
         val dataSourceFactory: DataSource.Factory = DataSource.Factory { exoDataSource }
 
         val extractorPreset = when (usbReadMode) {
-            HWEndpoint.ReadMode.DIRECT -> LONG_SAMPLING
-            HWEndpoint.ReadMode.BUFFER_BLOCKING -> MEDIUM_SAMPLING
-            HWEndpoint.ReadMode.BUFFER_NOTBLOCKING -> SHORT_SAMPLING
+            HWEndpoint.ReadMode.DIRECT -> SAMPLING_DIRECT
+            HWEndpoint.ReadMode.BUFFER_BLOCKING -> SAMPLING_BUFFERED_PIPE
+            HWEndpoint.ReadMode.BUFFER_NOTBLOCKING -> SAMPLING_BUFFERED_RING
         }
         val extractorFactory = ExtractorsFactory {
             arrayOf(H264Extractor2(extractorPreset))
@@ -93,7 +93,7 @@ class FpvGogglesV1VideoFeed(
 
         try {
             Timber.tag(tag).v("Waiting for video feed to start.")
-            val readBytes = videoSource.readByteArray(DEFAULT_FRAME_SIZE)
+            val readBytes = videoSource.readByteArray(DEFAULT_FRAMEBUFFER_SIZE)
             Timber.tag(tag).v("Video feed has started, we got %d bytes", readBytes.size)
         } catch (e: Exception) {
             // java.io.InterruptedIOException: timeout ?
@@ -134,30 +134,30 @@ class FpvGogglesV1VideoFeed(
          * Random thought: Max frame size is correlated to sample time, higher sample time, smaller frame buffer?
          */
 
-        internal const val DEFAULT_FRAME_SIZE = 131072L
+        private const val DEFAULT_FRAMEBUFFER_SIZE = 131072L
         private const val DEFAULT_SAMPLE_TIME = 500L
 
         /**
          * Works nice with direct usb reader
          */
-        private val LONG_SAMPLING = H264Extractor2.Preset(
-            sampleTime = DEFAULT_SAMPLE_TIME * 4,
-            frameBufferSize = (DEFAULT_FRAME_SIZE * 0.25).toLong(),
+        private val SAMPLING_DIRECT = H264Extractor2.Preset(
+            frameBufferSize = DEFAULT_FRAMEBUFFER_SIZE / 2,
+            sampleTime = (DEFAULT_SAMPLE_TIME * 2),
         )
 
         /**
          * Works nice with pipe based usb reader
          */
-        private val MEDIUM_SAMPLING = H264Extractor2.Preset(
-            frameBufferSize = DEFAULT_FRAME_SIZE,
+        private val SAMPLING_BUFFERED_PIPE = H264Extractor2.Preset(
+            frameBufferSize = DEFAULT_FRAMEBUFFER_SIZE / 4,
             sampleTime = DEFAULT_SAMPLE_TIME,
         )
 
         /**
          * Works nice with ring buffer usb reader
          */
-        private val SHORT_SAMPLING = H264Extractor2.Preset(
-            frameBufferSize = DEFAULT_FRAME_SIZE * 2,
+        private val SAMPLING_BUFFERED_RING = H264Extractor2.Preset(
+            frameBufferSize = DEFAULT_FRAMEBUFFER_SIZE / 4,
             sampleTime = DEFAULT_SAMPLE_TIME / 2,
         )
     }

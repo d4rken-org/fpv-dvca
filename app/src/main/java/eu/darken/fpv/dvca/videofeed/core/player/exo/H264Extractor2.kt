@@ -23,7 +23,6 @@ class H264Extractor2(
 ) : Extractor {
     private val reader: H264Reader = H264Reader(SeiReader(emptyList()), false, true)
     private val sampleData: ParsableByteArray = ParsableByteArray(preset.frameBufferSize.toInt())
-    private var startedPacket = false
     private var firstSampleTimestampUs: Long = 0
 
     init {
@@ -34,12 +33,11 @@ class H264Extractor2(
 
     override fun init(output: ExtractorOutput) {
         reader.createTracks(output, TrackIdGenerator(0, 1))
-        output.endTracks()
         output.seekMap(Unseekable(C.TIME_UNSET))
+        output.endTracks()
     }
 
     override fun seek(position: Long, timeUs: Long) {
-        startedPacket = false
         reader.seek()
     }
 
