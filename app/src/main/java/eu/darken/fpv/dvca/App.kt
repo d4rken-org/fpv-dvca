@@ -8,7 +8,7 @@ import timber.log.Timber
 import javax.inject.Inject
 
 @HiltAndroidApp
-open class App : Application() {
+class App : Application() {
 
     @Inject lateinit var bugReporter: BugReporter
 
