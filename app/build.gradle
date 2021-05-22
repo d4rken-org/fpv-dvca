@@ -61,6 +61,7 @@ android {
             lintOptions {
                 abortOnError true
                 fatal 'StopShip'
+                disable 'Instantiatable'
             }
             ext.enableBugsnag = true
             minifyEnabled true
