@@ -1,9 +1,9 @@
 package eu.darken.fpv.dvca.usb.connection.io.read
 
-import android.hardware.usb.UsbDeviceConnection
 import android.hardware.usb.UsbEndpoint
 import android.os.SystemClock
 import eu.darken.fpv.dvca.App
+import eu.darken.fpv.dvca.usb.connection.HWConnection
 import eu.darken.fpv.dvca.usb.connection.io.HasUsbStats
 import okio.*
 import timber.log.Timber
@@ -12,11 +12,11 @@ import java.util.concurrent.TimeUnit
 import kotlin.concurrent.thread
 
 class UsbDataSourceBuffered(
+    private val connection: HWConnection,
     private val sender: UsbEndpoint,
-    private val connection: UsbDeviceConnection,
 ) : Source, HasUsbStats {
 
-    private val tag = App.logTag("Usb", "UsbDataSourceBuffered", this.hashCode().toString())
+    private val tag = App.logTag("Usb", "UsbDataSourceBuffered", connection.deviceIdentifier)
 
     private val pipe = Pipe(16 * 1024 * 1024)
     private val source = pipe.source.also {

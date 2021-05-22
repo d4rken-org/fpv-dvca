@@ -20,6 +20,7 @@ import android.hardware.usb.UsbDeviceConnection
 import android.hardware.usb.UsbEndpoint
 import android.os.SystemClock
 import eu.darken.fpv.dvca.App
+import eu.darken.fpv.dvca.usb.connection.HWConnection
 import eu.darken.fpv.dvca.usb.connection.io.CircularByteBuffer
 import eu.darken.fpv.dvca.usb.connection.io.HasUsbStats
 import timber.log.Timber
@@ -41,11 +42,11 @@ import kotlin.concurrent.thread
  * @see UsbEndpoint
  */
 class AndroidUSBInputStream2(
+    private val connection: HWConnection,
     private val receiveEndPoint: UsbEndpoint,
-    private val usbConnection: UsbDeviceConnection,
 ) : InputStream(), HasUsbStats {
 
-    private val tag = App.logTag("Usb", "AndroidUSBInputStream2", this.hashCode().toString())
+    private val tag = App.logTag("Usb", "AndroidUSBInputStream2", connection.deviceIdentifier)
 
     private var open = true
     private var readBuffer: CircularByteBuffer = CircularByteBuffer(32 * 1024 * 1024)
@@ -65,7 +66,7 @@ class AndroidUSBInputStream2(
             while (open) {
                 val buffer = ByteArray(1024)
                 val receivedBytes =
-                    usbConnection.bulkTransfer(receiveEndPoint, buffer, buffer.size, READ_TIMEOUT)
+                    connection.bulkTransfer(receiveEndPoint, buffer, buffer.size, READ_TIMEOUT)
                 if (receivedBytes > 0) {
                     val data = ByteArray(receivedBytes)
                     System.arraycopy(buffer, 0, data, 0, receivedBytes)

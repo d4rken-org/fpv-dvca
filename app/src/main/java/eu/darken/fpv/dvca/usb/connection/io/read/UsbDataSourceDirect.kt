@@ -1,9 +1,9 @@
 package eu.darken.fpv.dvca.usb.connection.io.read
 
-import android.hardware.usb.UsbDeviceConnection
 import android.hardware.usb.UsbEndpoint
 import android.os.SystemClock
 import eu.darken.fpv.dvca.App
+import eu.darken.fpv.dvca.usb.connection.HWConnection
 import eu.darken.fpv.dvca.usb.connection.io.HasUsbStats
 import okio.Buffer
 import okio.Cursor
@@ -12,11 +12,11 @@ import okio.Timeout
 import timber.log.Timber
 
 class UsbDataSourceDirect(
+    private val connection: HWConnection,
     private val sender: UsbEndpoint,
-    private val connection: UsbDeviceConnection,
 ) : Source, HasUsbStats {
 
-    private val tag = App.logTag("Usb", "UsbDataSourceDirect", this.hashCode().toString())
+    private val tag = App.logTag("Usb", "UsbDataSourceDirect", connection.deviceIdentifier)
     private var bufferBytesRead = 0L
     private var bufferBytesLast = SystemClock.elapsedRealtime()
     private val transferBuffer = ByteArray(131072)

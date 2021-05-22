@@ -2,6 +2,8 @@ package eu.darken.fpv.dvca.usb.connection
 
 import android.hardware.usb.UsbDevice
 import android.hardware.usb.UsbDeviceConnection
+import android.hardware.usb.UsbEndpoint
+import android.hardware.usb.UsbInterface
 import eu.darken.fpv.dvca.App
 import eu.darken.fpv.dvca.usb.manager.identifier
 import timber.log.Timber
@@ -21,7 +23,7 @@ class HWConnection(
     fun getInterface(index: Int): HWInterface {
 
         return HWInterface(
-            rawConnection = rawConnection,
+            connection = this,
             rawInterface = rawDevice.getInterface(index),
         )
     }
@@ -29,6 +31,18 @@ class HWConnection(
     override fun close() {
         Timber.tag(TAG).v("close()")
         rawConnection.close()
+    }
+
+    fun bulkTransfer(endpoint: UsbEndpoint, buffer: ByteArray, length: Int, timeout: Int): Int {
+        return rawConnection.bulkTransfer(endpoint, buffer, length, timeout)
+    }
+
+    fun claimInterface(rawInterface: UsbInterface, forced: Boolean): Boolean {
+        return rawConnection.claimInterface(rawInterface, forced)
+    }
+
+    fun releaseInterface(rawInterface: UsbInterface): Boolean {
+        return rawConnection.releaseInterface(rawInterface)
     }
 
     companion object {

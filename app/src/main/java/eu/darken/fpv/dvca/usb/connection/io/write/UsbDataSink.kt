@@ -1,8 +1,8 @@
 package eu.darken.fpv.dvca.usb.connection.io.write
 
-import android.hardware.usb.UsbDeviceConnection
 import android.hardware.usb.UsbEndpoint
 import eu.darken.fpv.dvca.App
+import eu.darken.fpv.dvca.usb.connection.HWConnection
 import okio.Buffer
 import okio.IOException
 import okio.Sink
@@ -14,9 +14,12 @@ import java.util.concurrent.TimeUnit
 import kotlin.concurrent.thread
 
 class UsbDataSink constructor(
+    private val connection: HWConnection,
     private val receiver: UsbEndpoint,
-    private val connection: UsbDeviceConnection,
 ) : Sink {
+
+
+    private val TAG = App.logTag("Usb", "DataSink", connection.deviceIdentifier)
 
     private val writeQueue = LinkedBlockingQueue<ByteArray?>(512)
     private val timeout = Timeout()
@@ -54,9 +57,5 @@ class UsbDataSink constructor(
     override fun close() {
         Timber.tag(TAG).v("close()")
         open = false
-    }
-
-    companion object {
-        private val TAG = App.logTag("Usb", "DataSink")
     }
 }

@@ -1,6 +1,5 @@
 package eu.darken.fpv.dvca.usb.connection
 
-import android.hardware.usb.UsbDeviceConnection
 import android.hardware.usb.UsbEndpoint
 import eu.darken.fpv.dvca.App
 import eu.darken.fpv.dvca.usb.connection.io.HasUsbStats
@@ -15,7 +14,7 @@ import okio.source
 import timber.log.Timber
 
 class HWEndpoint(
-    private val rawConnection: UsbDeviceConnection,
+    private val connection: HWConnection,
     private val rawEndpoint: UsbEndpoint
 ) {
 
@@ -28,19 +27,19 @@ class HWEndpoint(
         get() = writeStatsSource
 
     fun sink(): BufferedSink = UsbDataSink(
-        rawEndpoint,
-        rawConnection
+        connection,
+        rawEndpoint
     ).buffer()
 
     fun source(readMode: ReadMode = ReadMode.BUFFERED_BLOCKING): BufferedSource = when (readMode) {
-        ReadMode.BUFFERED_NOT_BLOCKING -> AndroidUSBInputStream2(rawEndpoint, rawConnection).run {
+        ReadMode.BUFFERED_NOT_BLOCKING -> AndroidUSBInputStream2(connection, rawEndpoint).run {
             readStatsSource = this
             source()
         }
-        ReadMode.BUFFERED_BLOCKING -> UsbDataSourceBuffered(rawEndpoint, rawConnection).apply {
+        ReadMode.BUFFERED_BLOCKING -> UsbDataSourceBuffered(connection, rawEndpoint).apply {
             readStatsSource = this
         }
-        ReadMode.UNBUFFERED_DIRECT -> UsbDataSourceDirect(rawEndpoint, rawConnection).apply {
+        ReadMode.UNBUFFERED_DIRECT -> UsbDataSourceDirect(connection, rawEndpoint).apply {
             readStatsSource = this
         }
     }.buffer().also {
