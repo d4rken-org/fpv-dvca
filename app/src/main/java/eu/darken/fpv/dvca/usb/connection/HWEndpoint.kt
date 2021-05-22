@@ -18,11 +18,11 @@ class HWEndpoint(
     private val rawEndpoint: UsbEndpoint
 ) {
 
-    var readStatsSource: HasUsbStats = HasUsbStats.DUMMY
+    private var readStatsSource: HasUsbStats = HasUsbStats.DUMMY
     val readStats: HasUsbStats
         get() = readStatsSource
 
-    var writeStatsSource: HasUsbStats = HasUsbStats.DUMMY
+    private var writeStatsSource: HasUsbStats = HasUsbStats.DUMMY
     val writeStats: HasUsbStats
         get() = writeStatsSource
 

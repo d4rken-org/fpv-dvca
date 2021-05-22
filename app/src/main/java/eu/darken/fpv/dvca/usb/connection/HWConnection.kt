@@ -20,18 +20,10 @@ class HWConnection(
     val deviceIdentifier: String
         get() = rawDevice.identifier
 
-    fun getInterface(index: Int): HWInterface {
-
-        return HWInterface(
-            connection = this,
-            rawInterface = rawDevice.getInterface(index),
-        )
-    }
-
-    override fun close() {
-        Timber.tag(TAG).v("close()")
-        rawConnection.close()
-    }
+    fun getInterface(index: Int): HWInterface = HWInterface(
+        connection = this,
+        rawInterface = rawDevice.getInterface(index),
+    )
 
     fun bulkTransfer(endpoint: UsbEndpoint, buffer: ByteArray, length: Int, timeout: Int): Int {
         return rawConnection.bulkTransfer(endpoint, buffer, length, timeout)
@@ -43,6 +35,11 @@ class HWConnection(
 
     fun releaseInterface(rawInterface: UsbInterface): Boolean {
         return rawConnection.releaseInterface(rawInterface)
+    }
+
+    override fun close() {
+        Timber.tag(TAG).v("close()")
+        rawConnection.close()
     }
 
     companion object {
