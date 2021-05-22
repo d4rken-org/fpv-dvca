@@ -6,7 +6,7 @@ import eu.darken.fpv.dvca.App
 import timber.log.Timber
 
 abstract class VM : ViewModel() {
-    val TAG: String = App.logTag("VM", javaClass.simpleName)
+   private val TAG: String = App.logTag("VM", javaClass.simpleName)
 
     init {
         Timber.tag(TAG).v("Initialized")

@@ -21,22 +21,17 @@ interface Gear {
     val gearName: String
         get() = device.productName
 
-    val isGearConnected: Boolean
-
     val logId: String
         get() = "$identifier $gearName"
 
     val events: Flow<Event>
 
+    suspend fun release()
+
     sealed interface Event {
+
         val gear: Gear
-
-        data class GearAttached(override val gear: Gear) : Event
-
-        data class GearDetached(override val gear: Gear) : Event
     }
-
-    suspend fun updateDevice(device: HWDevice?)
 
     interface Factory {
         fun canHandle(device: HWDevice): Boolean

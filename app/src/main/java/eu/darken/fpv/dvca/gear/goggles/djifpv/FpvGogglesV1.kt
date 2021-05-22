@@ -19,18 +19,11 @@ import timber.log.Timber
 import java.time.Instant
 
 class FpvGogglesV1 @AssistedInject constructor(
-    @Assisted private val initialDevice: HWDevice,
+    @Assisted override val device: HWDevice,
     @ApplicationContext private val context: Context,
     private val gearManager: GearManager,
     private val generalFeedSettings: GeneralFeedSettings,
 ) : Goggles {
-    private var currentDevice: HWDevice? = initialDevice
-
-    override val device: HWDevice
-        get() = currentDevice ?: initialDevice
-
-    override val isGearConnected: Boolean
-        get() = currentDevice != null
 
     override val firstSeenAt: Instant = Instant.now()
 
@@ -40,47 +33,15 @@ class FpvGogglesV1 @AssistedInject constructor(
 
     private var wasVideoActive: Boolean = false
 
-    override suspend fun updateDevice(device: HWDevice?) {
-        Timber.tag(TAG).d("updateDevice(device=%s)", device)
-
-        val reconnect = device != null && currentDevice == null
-
-        currentDevice = device
-
-        if (device == null) {
-            Timber.tag(TAG).w("Device disconnected!")
-
-            val wasActive = videoFeedInternal.value != null || wasVideoActive
-            if (wasActive) {
-                Timber.tag(TAG).d("Video feed was active on disconnect, will restart after reconnect.")
-            }
-
-            stopVideoFeed()
-
-            wasVideoActive = wasActive
-
-            eventsInternal.value = Gear.Event.GearDetached(this)
-        } else if (reconnect) {
-            Timber.tag(TAG).w("Device reconnected!")
-
-            eventsInternal.value = Gear.Event.GearAttached(this)
-            if (wasVideoActive) {
-                Timber.tag(TAG).i("Video feed was previously active, starting again.")
-                startVideoFeed()
-            } else {
-                Timber.tag(TAG).v("Video was previously not active.")
-            }
-        }
-    }
-
-    private val videoFeedInternal = MutableStateFlow<Goggles.VideoFeed?>(null)
-    override val videoFeed: Flow<Goggles.VideoFeed?> = videoFeedInternal
+    private var videoFeedInternal: Goggles.VideoFeed? = null
+    override val videoFeed: Goggles.VideoFeed?
+        get() = videoFeedInternal
 
     private var connection: HWConnection? = null
 
     override suspend fun startVideoFeed(): Goggles.VideoFeed {
         Timber.tag(TAG).i("startVideoFeed()")
-        videoFeedInternal.value?.let {
+        videoFeedInternal?.let {
             Timber.tag(TAG).w("Feed is already active!")
             return it
         }
@@ -92,28 +53,34 @@ class FpvGogglesV1 @AssistedInject constructor(
             connection!!,
             usbReadMode = generalFeedSettings.feedModeDefault.value,
         ).also { feed ->
-            videoFeedInternal.value = feed
+            videoFeedInternal = feed
         }
     }
 
     override suspend fun stopVideoFeed() {
         Timber.tag(TAG).i("stopVideoFeed()")
-        videoFeedInternal.value?.let {
+        videoFeedInternal?.let {
             it.close()
             wasVideoActive = false
         }
-        videoFeedInternal.value = null
+        videoFeedInternal = null
 
         connection?.close()
         connection = null
     }
+
+    override suspend fun release() {
+        Timber.tag(TAG).d("release()")
+        stopVideoFeed()
+    }
+
+    override fun toString(): String = device.logId
 
     companion object {
         private val TAG = App.logTag("Gear", "FpvGogglesV1")
         private const val VENDOR_ID = 11427
         private const val PRODUCT_ID = 31
     }
-
 
     @AssistedFactory
     abstract class Factory : Gear.Factory {

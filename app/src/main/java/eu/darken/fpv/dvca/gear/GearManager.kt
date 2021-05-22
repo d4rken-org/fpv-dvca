@@ -42,7 +42,7 @@ class GearManager @Inject constructor(
     private suspend fun updateGearMap(devices: Set<HWDevice>) = mutex.withLock {
         Timber.tag(TAG).v("Updating gear...")
 
-        val currentGears = devices.mapNotNull { device ->
+        val latestGears = devices.mapNotNull { device ->
             val gear = device.createGear()
             if (gear == null) {
                 Timber.tag(TAG).d("Unknown device, couldn't create gear: %s", device.logId)
@@ -61,52 +61,28 @@ class GearManager @Inject constructor(
         }
 
         val consumed = mutableSetOf<String>()
+        val disconnected = mutableSetOf<String>()
 
-        // Sort out those that didn't change
-        currentGears.forEach { maybeNew ->
-            val stillConnected = gearMap.values
-                .filter { it.isGearConnected }
-                .singleOrNull { it.identifier == maybeNew.identifier }
+        // Sort out still connected and disconnected ones
+        gearMap.values.forEach { existing ->
+            val match = latestGears.singleOrNull { it.identifier == existing.identifier }
 
-            if (stillConnected != null) {
-                Timber.tag(TAG).v("Still connected: %s", stillConnected.logId)
-                consumed.add(maybeNew.identifier)
+            if (match != null) {
+                Timber.tag(TAG).v("Still connected: %s", match.logId)
+                consumed.add(match.identifier)
+            } else {
+                disconnected.add(existing.identifier)
             }
         }
 
+        disconnected.forEach {
+            val removed = gearMap.remove(it)!!
+            removed.release()
+            Timber.tag(TAG).i("Disconnected: %s", removed.logId)
+        }
 
-        // Was this a reconnect on the same identifier?
-        currentGears
-            .filterNot { consumed.contains(it.identifier) }
-            .forEach { maybeNew ->
-                val reconnectFor = gearMap.values
-                    .filter { !it.isGearConnected }
-                    .firstOrNull { it.identifier == maybeNew.identifier }
-
-                if (reconnectFor != null) {
-                    Timber.tag(TAG).d("Found a reconnect, updating %s with %s", reconnectFor, maybeNew.device)
-                    reconnectFor.updateDevice(maybeNew.device)
-                    consumed.add(maybeNew.identifier)
-                }
-            }
-
-        // YOLO any remaining matches, one is better than none?
-        currentGears
-            .filterNot { consumed.contains(it.identifier) }
-            .forEach { maybeNew ->
-                val ballParkMatch = gearMap.values
-                    .filter { !it.isGearConnected }
-                    .firstOrNull { it.gearName == maybeNew.gearName }
-
-                if (ballParkMatch != null) {
-                    Timber.tag(TAG).v("Ballpark matched %s with %s", ballParkMatch.logId, maybeNew.logId)
-                    ballParkMatch.updateDevice(maybeNew.device)
-                    consumed.add(maybeNew.identifier)
-                }
-            }
-
-        // Add all new unknown gears
-        currentGears
+        // Add all new gears
+        latestGears
             .filterNot { consumed.contains(it.identifier) }
             .forEach { maybeNew ->
                 val newGearId = maybeNew.identifier
@@ -116,8 +92,9 @@ class GearManager @Inject constructor(
                 consumed.add(maybeNew.identifier)
             }
 
-        Timber.tag(TAG).v("...gear update done.")
-        internalGearFlow.value = gearMap.values.toSet()
+        internalGearFlow.value = gearMap.values.toSet().also {
+            Timber.tag(TAG).v("...gear update done: %s", it)
+        }
     }
 
     private fun HWDevice.findFactory(): Gear.Factory? = factories.singleOrNull { it.canHandle(this) }

@@ -8,7 +8,6 @@ import android.view.View
 import androidx.core.view.isGone
 import androidx.core.view.isInvisible
 import androidx.fragment.app.viewModels
-import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import eu.darken.fpv.dvca.App
 import eu.darken.fpv.dvca.R
@@ -20,7 +19,6 @@ import eu.darken.fpv.dvca.common.showSystemUI
 import eu.darken.fpv.dvca.common.smart.SmartFragment
 import eu.darken.fpv.dvca.common.viewbinding.viewBindingLazy
 import eu.darken.fpv.dvca.databinding.VideofeedFragmentBinding
-import eu.darken.fpv.dvca.gear.GearManager
 import eu.darken.fpv.dvca.gear.goggles.Goggles
 import eu.darken.fpv.dvca.videofeed.core.player.exo.ExoFeedPlayer
 import eu.darken.fpv.dvca.videofeed.core.player.exo.RenderInfo
@@ -37,15 +35,9 @@ class VideoFeedFragment : SmartFragment(R.layout.videofeed_fragment) {
     @Inject lateinit var exoPlayer1: ExoFeedPlayer
     @Inject lateinit var exoPlayer2: ExoFeedPlayer
 
-    //    @Inject lateinit var mediaPlayer: MediaFeedPlayer
-    @Inject lateinit var gearManager: GearManager
-
-    private var reconnectToast: Snackbar? = null
-
     private val versionTag: String by lazy {
         "DVCA ${BuildConfigWrap.VERSION_NAME}(${BuildConfigWrap.GITSHA})"
     }
-
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -84,10 +76,8 @@ class VideoFeedFragment : SmartFragment(R.layout.videofeed_fragment) {
             player1Placeholder.text = getString(R.string.video_feed_player_tease, "1")
 
             vm.google1Feed.observe2(this@VideoFeedFragment) { feed ->
+                Timber.tag(TAG).d("google1Feed.observe2(): %s", feed)
                 if (feed != null) {
-                    reconnectToast?.dismiss()
-                    reconnectToast = null
-
                     exoPlayer1.start(
                         feed = feed,
                         surfaceView = player1Canvas,
@@ -101,15 +91,6 @@ class VideoFeedFragment : SmartFragment(R.layout.videofeed_fragment) {
                     )
                 } else {
                     exoPlayer1.stop()
-
-                    reconnectToast?.dismiss()
-                    Snackbar.make(
-                        requireView(),
-                        getString(R.string.status_message_waiting_for_device),
-                        Snackbar.LENGTH_INDEFINITE
-                    ).also {
-                        reconnectToast = it
-                    }.show()
                 }
                 player1Placeholder.isGone = feed != null
                 player1Canvas.isInvisible = feed == null
@@ -124,10 +105,9 @@ class VideoFeedFragment : SmartFragment(R.layout.videofeed_fragment) {
             player2Placeholder.text = getString(R.string.video_feed_player_tease, "2")
 
             vm.google2Feed.observe2(this@VideoFeedFragment) { feed ->
-                if (feed != null) {
-                    reconnectToast?.dismiss()
-                    reconnectToast = null
+                Timber.tag(TAG).d("google2Feed.observe2(): %s", feed)
 
+                if (!isInLandscape && feed != null) {
                     exoPlayer2.start(
                         feed = feed,
                         surfaceView = player2Canvas,
@@ -141,15 +121,6 @@ class VideoFeedFragment : SmartFragment(R.layout.videofeed_fragment) {
                     )
                 } else {
                     exoPlayer2.stop()
-
-                    reconnectToast?.dismiss()
-                    Snackbar.make(
-                        requireView(),
-                        getString(R.string.status_message_waiting_for_device),
-                        Snackbar.LENGTH_INDEFINITE
-                    ).also {
-                        reconnectToast = it
-                    }.show()
                 }
                 player2Placeholder.isGone = feed != null
                 player2Canvas.isInvisible = feed == null
@@ -185,6 +156,7 @@ class VideoFeedFragment : SmartFragment(R.layout.videofeed_fragment) {
 
     override fun onDestroyView() {
         exoPlayer1.stop()
+        exoPlayer2.stop()
         super.onDestroyView()
     }
 
