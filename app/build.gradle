@@ -136,7 +136,7 @@ dependencies {
     implementation("com.squareup.okio:okio:3.0.0-alpha.4")
     implementation 'com.google.android.exoplayer:exoplayer:2.14.0'
 
-    implementation 'com.arthenica:ffmpeg-kit-full:4.4.LTS'
+    debugImplementation 'com.arthenica:ffmpeg-kit-full:4.4.LTS'
 
     // Kotlin
     implementation "org.jetbrains.kotlin:kotlin-stdlib:${versions.kotlin.core}"
