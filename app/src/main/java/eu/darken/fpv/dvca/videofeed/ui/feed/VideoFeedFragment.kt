@@ -145,11 +145,10 @@ class VideoFeedFragment : SmartFragment(R.layout.videofeed_fragment) {
     }
 
     private fun createMetaDataDesc(info: RenderInfo, feed: Goggles.VideoFeed): String {
-        val sb = StringBuilder(feed.deviceIdentifier)
-        sb.append(" ")
+        val sb = StringBuilder()
+        sb.append("$versionTag @ ${feed.deviceIdentifier}\n")
         sb.append(info.toString())
-        sb.append(" [MB/s USB ${feed.videoUsbReadMbs}|BUF ${feed.videoBufferReadMbs} ~ ${feed.usbReadMode}]")
-        sb.append(" $versionTag")
+        sb.append(" [USB ${feed.videoUsbReadMbs} | BUFFER ${feed.videoBufferReadMbs} MB/s ~ ${feed.usbReadMode}]")
 
         return sb.toString()
     }

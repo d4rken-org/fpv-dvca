@@ -22,7 +22,7 @@ class GeneralFeedSettings @Inject constructor(
         reader = { key ->
             getString(key, null).let { value ->
                 HWEndpoint.ReadMode.values().singleOrNull { it.key == value }
-            } ?: HWEndpoint.ReadMode.UNBUFFERED_DIRECT
+            } ?: HWEndpoint.ReadMode.DIRECT
         },
         writer = { key, value ->
             putString(key, value.key)

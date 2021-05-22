@@ -67,9 +67,9 @@ class FpvGogglesV1VideoFeed(
         val dataSourceFactory: DataSource.Factory = DataSource.Factory { exoDataSource }
 
         val extractorPreset = when (usbReadMode) {
-            HWEndpoint.ReadMode.UNBUFFERED_DIRECT -> LONG_SAMPLING
-            HWEndpoint.ReadMode.BUFFERED_BLOCKING -> MEDIUM_SAMPLING
-            HWEndpoint.ReadMode.BUFFERED_NOT_BLOCKING -> SHORT_SAMPLING
+            HWEndpoint.ReadMode.DIRECT -> LONG_SAMPLING
+            HWEndpoint.ReadMode.BUFFER_BLOCKING -> MEDIUM_SAMPLING
+            HWEndpoint.ReadMode.BUFFER_NOTBLOCKING -> SHORT_SAMPLING
         }
         val extractorFactory = ExtractorsFactory {
             arrayOf(H264Extractor2(extractorPreset))
