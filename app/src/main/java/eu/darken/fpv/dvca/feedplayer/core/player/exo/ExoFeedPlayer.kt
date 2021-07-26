@@ -1,12 +1,12 @@
-package eu.darken.fpv.dvca.videofeed.core.player.exo
+package eu.darken.fpv.dvca.feedplayer.core.player.exo
 
 import android.content.Context
 import android.view.SurfaceView
 import com.google.android.exoplayer2.*
 import dagger.hilt.android.qualifiers.ApplicationContext
 import eu.darken.fpv.dvca.App
+import eu.darken.fpv.dvca.feedplayer.core.player.FeedPlayer
 import eu.darken.fpv.dvca.gear.goggles.Goggles
-import eu.darken.fpv.dvca.videofeed.core.player.FeedPlayer
 import timber.log.Timber
 import javax.inject.Inject
 

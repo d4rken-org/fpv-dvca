@@ -11,10 +11,10 @@ import com.google.android.exoplayer2.upstream.DataSource
 import com.google.android.exoplayer2.upstream.DataSpec
 import com.google.android.exoplayer2.upstream.TransferListener
 import eu.darken.fpv.dvca.App
+import eu.darken.fpv.dvca.feedplayer.core.player.exo.H264Extractor2
 import eu.darken.fpv.dvca.gear.goggles.Goggles
 import eu.darken.fpv.dvca.usb.connection.HWConnection
 import eu.darken.fpv.dvca.usb.connection.HWEndpoint
-import eu.darken.fpv.dvca.videofeed.core.player.exo.H264Extractor2
 import okio.*
 import timber.log.Timber
 

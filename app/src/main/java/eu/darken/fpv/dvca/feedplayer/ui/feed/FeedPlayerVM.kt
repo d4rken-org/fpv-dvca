@@ -1,4 +1,4 @@
-package eu.darken.fpv.dvca.videofeed.ui.feed
+package eu.darken.fpv.dvca.feedplayer.ui.feed
 
 import android.content.Context
 import android.content.Intent
@@ -10,6 +10,7 @@ import eu.darken.fpv.dvca.App
 import eu.darken.fpv.dvca.common.livedata.SingleLiveEvent
 import eu.darken.fpv.dvca.common.viewmodel.SmartVM
 import eu.darken.fpv.dvca.dvr.GeneralDvrSettings
+import eu.darken.fpv.dvca.feedplayer.core.FeedPlayerSettings
 import eu.darken.fpv.dvca.gear.GearManager
 import eu.darken.fpv.dvca.gear.goggles.Goggles
 import kotlinx.coroutines.flow.map
@@ -18,11 +19,12 @@ import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
-class VideoFeedVM @Inject constructor(
+class FeedPlayerVM @Inject constructor(
     private val handle: SavedStateHandle,
     @ApplicationContext private val context: Context,
     private val gearManager: GearManager,
     private val dvrSettings: GeneralDvrSettings,
+    private val feedPlayerSettings: FeedPlayerSettings,
 ) : SmartVM() {
 
     private val goggles = gearManager.availableGear
@@ -66,6 +68,8 @@ class VideoFeedVM @Inject constructor(
         .onEach { Timber.tag(TAG).d("Videofeed 2: %s", it) }
         .asLiveData2()
 
+    val isMultiplayerInLandscapeAllowed: Boolean
+        get() = feedPlayerSettings.isLandscapeMultiplayerEnabled.value
 
     val dvrStoragePathEvent = SingleLiveEvent<Unit>()
 

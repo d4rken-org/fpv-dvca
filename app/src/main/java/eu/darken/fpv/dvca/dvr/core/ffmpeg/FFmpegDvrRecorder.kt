@@ -19,7 +19,6 @@ class FFmpegDvrRecorder @Inject constructor(
 
     // TODO
     override fun record(source: Source, safUri: Uri): DvrRecorder.Session {
-
         val inPipe = FFmpegKitConfig.registerNewFFmpegPipe(context)
 
         val ffmpegTarget = FFmpegKitConfig.getSafParameterForWrite(context, safUri)

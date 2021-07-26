@@ -55,6 +55,12 @@ class GeneralSettingsFragment : SmartFragment(R.layout.settings_fragment) {
             }
         }
 
+        vm.isMultiplayerLandscapeEnabled.observe2(this) { isEnabled ->
+            binding.playbackMultiplayerLandscape.isChecked = isEnabled
+        }
+        binding.playbackMultiplayerLandscape.setOnCheckedChangedListener { _, checked ->
+            vm.updateMultiplayerLandscape(checked)
+        }
 
         vm.currentStoragePath.observe2(this@GeneralSettingsFragment) {
             binding.dvrPath.apply {

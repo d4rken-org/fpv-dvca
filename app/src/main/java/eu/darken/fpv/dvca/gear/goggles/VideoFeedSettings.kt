@@ -1,4 +1,4 @@
-package eu.darken.fpv.dvca.videofeed.core
+package eu.darken.fpv.dvca.gear.goggles
 
 import android.content.Context
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -9,7 +9,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class GeneralFeedSettings @Inject constructor(
+class VideoFeedSettings @Inject constructor(
     @ApplicationContext private val context: Context,
 ) {
 

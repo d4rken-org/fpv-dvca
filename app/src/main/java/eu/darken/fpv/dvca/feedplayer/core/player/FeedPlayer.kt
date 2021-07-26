@@ -1,8 +1,8 @@
-package eu.darken.fpv.dvca.videofeed.core.player
+package eu.darken.fpv.dvca.feedplayer.core.player
 
 import android.view.SurfaceView
+import eu.darken.fpv.dvca.feedplayer.core.player.exo.RenderInfo
 import eu.darken.fpv.dvca.gear.goggles.Goggles
-import eu.darken.fpv.dvca.videofeed.core.player.exo.RenderInfo
 
 interface FeedPlayer {
 

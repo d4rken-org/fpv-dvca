@@ -15,7 +15,7 @@ class SwitchPreferenceView @JvmOverloads constructor(
     defStyleAttr = defStyleAttr
 ) {
     private lateinit var toggle: SwitchCompat
-    private var toggleListener: Listener? = null
+    private var toggleListener: ((SwitchPreferenceView, Boolean) -> Unit)? = null
 
 
     override fun onFinishInflate() {
@@ -32,15 +32,11 @@ class SwitchPreferenceView @JvmOverloads constructor(
             toggle.isChecked = checked
         }
 
-    fun setOnCheckedChangedListener(listener: Listener) {
+    fun setOnCheckedChangedListener(listener: (SwitchPreferenceView, Boolean) -> Unit) {
         toggleListener = listener
-        setOnClickListener { _: View? ->
+        setOnClickListener {
             toggle.isChecked = !toggle.isChecked
-            listener.onCheckedChanged(this@SwitchPreferenceView, isChecked)
+            listener(this@SwitchPreferenceView, isChecked)
         }
-    }
-
-    interface Listener {
-        fun onCheckedChanged(view: SwitchPreferenceView?, checked: Boolean)
     }
 }

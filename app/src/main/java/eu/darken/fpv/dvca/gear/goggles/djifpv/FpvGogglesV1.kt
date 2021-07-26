@@ -9,9 +9,9 @@ import eu.darken.fpv.dvca.App
 import eu.darken.fpv.dvca.gear.Gear
 import eu.darken.fpv.dvca.gear.GearManager
 import eu.darken.fpv.dvca.gear.goggles.Goggles
+import eu.darken.fpv.dvca.gear.goggles.VideoFeedSettings
 import eu.darken.fpv.dvca.usb.HWDevice
 import eu.darken.fpv.dvca.usb.connection.HWConnection
-import eu.darken.fpv.dvca.videofeed.core.GeneralFeedSettings
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.filterNotNull
@@ -22,7 +22,7 @@ class FpvGogglesV1 @AssistedInject constructor(
     @Assisted override val device: HWDevice,
     @ApplicationContext private val context: Context,
     private val gearManager: GearManager,
-    private val generalFeedSettings: GeneralFeedSettings,
+    private val videoFeedSettings: VideoFeedSettings,
 ) : Goggles {
 
     override val firstSeenAt: Instant = Instant.now()
@@ -51,7 +51,7 @@ class FpvGogglesV1 @AssistedInject constructor(
         return FpvGogglesV1VideoFeed(
             context,
             connection!!,
-            usbReadMode = generalFeedSettings.feedModeDefault.value,
+            usbReadMode = videoFeedSettings.feedModeDefault.value,
         ).also { feed ->
             videoFeedInternal = feed
         }

@@ -1,4 +1,4 @@
-package eu.darken.fpv.dvca.videofeed.core.player.exo
+package eu.darken.fpv.dvca.feedplayer.core.player.exo
 
 import android.content.Context
 import android.os.Handler

@@ -6,7 +6,7 @@
     app:startDestination="@id/videoFeedFragment">
     <fragment
         android:id="@+id/videoFeedFragment"
-        android:name="eu.darken.fpv.dvca.videofeed.ui.feed.VideoFeedFragment"
+        android:name="eu.darken.fpv.dvca.feedplayer.ui.feed.FeedPlayerFragment"
         android:label="VideoFeedFragment"
         tools:layout="@layout/videofeed_fragment">
         <action

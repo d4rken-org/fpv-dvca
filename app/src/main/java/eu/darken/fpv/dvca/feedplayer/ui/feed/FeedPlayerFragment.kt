@@ -1,10 +1,11 @@
-package eu.darken.fpv.dvca.videofeed.ui.feed
+package eu.darken.fpv.dvca.feedplayer.ui.feed
 
 import android.content.Intent
 import android.content.res.Configuration
 import android.net.Uri
 import android.os.Bundle
 import android.view.View
+import android.widget.LinearLayout
 import androidx.core.view.isGone
 import androidx.core.view.isInvisible
 import androidx.fragment.app.viewModels
@@ -20,17 +21,17 @@ import eu.darken.fpv.dvca.common.showSystemUI
 import eu.darken.fpv.dvca.common.smart.SmartFragment
 import eu.darken.fpv.dvca.common.viewbinding.viewBindingLazy
 import eu.darken.fpv.dvca.databinding.VideofeedFragmentBinding
+import eu.darken.fpv.dvca.feedplayer.core.player.exo.ExoFeedPlayer
+import eu.darken.fpv.dvca.feedplayer.core.player.exo.RenderInfo
 import eu.darken.fpv.dvca.gear.goggles.Goggles
-import eu.darken.fpv.dvca.videofeed.core.player.exo.ExoFeedPlayer
-import eu.darken.fpv.dvca.videofeed.core.player.exo.RenderInfo
 import timber.log.Timber
 import javax.inject.Inject
 
 
 @AndroidEntryPoint
-class VideoFeedFragment : SmartFragment(R.layout.videofeed_fragment) {
+class FeedPlayerFragment : SmartFragment(R.layout.videofeed_fragment) {
 
-    private val vm: VideoFeedVM by viewModels()
+    private val vm: FeedPlayerVM by viewModels()
     private val binding: VideofeedFragmentBinding by viewBindingLazy()
 
     @Inject lateinit var exoPlayer1: ExoFeedPlayer
@@ -51,15 +52,15 @@ class VideoFeedFragment : SmartFragment(R.layout.videofeed_fragment) {
             root.setOnClickListener {
                 if (toolbar.isGone) exitImmersive() else enterImmersive()
             }
-            toolbar.inflateMenu(R.menu.feed_general_menu)
+            toolbar.inflateMenu(R.menu.feedplayer_menu)
             toolbar.setOnMenuItemClickListener {
                 when (it.itemId) {
                     R.id.settings -> {
-                        doNavigate(VideoFeedFragmentDirections.actionVideoFeedFragmentToSettingsFragment())
+                        doNavigate(FeedPlayerFragmentDirections.actionVideoFeedFragmentToSettingsFragment())
                         true
                     }
                     R.id.info -> {
-                        doNavigate(VideoFeedFragmentDirections.actionVideoFeedFragmentToInfoFragment())
+                        doNavigate(FeedPlayerFragmentDirections.actionVideoFeedFragmentToInfoFragment())
                         true
                     }
                     R.id.donate -> {
@@ -79,7 +80,7 @@ class VideoFeedFragment : SmartFragment(R.layout.videofeed_fragment) {
                 vm.onPlayer1RecordToggle()
             }
 
-            vm.google1Feed.observe2(this@VideoFeedFragment) { feed ->
+            vm.google1Feed.observe2(this@FeedPlayerFragment) { feed ->
                 Timber.tag(TAG).d("google1Feed.observe2(): %s", feed)
                 if (feed != null) {
                     exoPlayer1.start(
@@ -99,20 +100,24 @@ class VideoFeedFragment : SmartFragment(R.layout.videofeed_fragment) {
                 player1Placeholder.isGone = feed != null
                 player1Canvas.isInvisible = feed == null
                 player1Metadata.isInvisible = feed == null
-                player1RecordFab.isGone = feed == null
+                player1RecordFab.isGone = true // feed == null
             }
         }
 
         // Player 2
         binding.apply {
-            player2Container.isGone = isInLandscape
+            playerContainer.orientation = when (isInLandscape) {
+                true -> LinearLayout.HORIZONTAL
+                false -> LinearLayout.VERTICAL
+            }
+            player2Container.isGone = isInLandscape && !vm.isMultiplayerInLandscapeAllowed
 
             player2Placeholder.text = getString(R.string.video_feed_player_tease, "2")
             player2RecordFab.setOnClickListener {
                 vm.onPlayer2RecordToggle()
             }
 
-            vm.google2Feed.observe2(this@VideoFeedFragment) { feed ->
+            vm.google2Feed.observe2(this@FeedPlayerFragment) { feed ->
                 Timber.tag(TAG).d("google2Feed.observe2(): %s", feed)
 
                 if (!isInLandscape && feed != null) {
@@ -133,7 +138,7 @@ class VideoFeedFragment : SmartFragment(R.layout.videofeed_fragment) {
                 player2Placeholder.isGone = feed != null
                 player2Canvas.isInvisible = feed == null
                 player2Metadata.isInvisible = feed == null
-                player2RecordFab.isGone = feed == null
+                player2RecordFab.isGone = true //feed == null
             }
         }
 

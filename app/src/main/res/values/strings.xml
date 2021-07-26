@@ -31,4 +31,6 @@
     <string name="msg_restart_for_effect">Restart app for setting to take effect</string>
     <string name="dvr_path_label">DVR Storage Path</string>
     <string name="dvr_path_description">Default storage path for DVR recordings.</string>
+    <string name="playback_multiplayer_landscape_label">Landscape multiplayer</string>
+    <string name="playback_multiplayer_landscape_description">Display multiple player feeds in landscape mode.</string>
 </resources>
