@@ -5,28 +5,22 @@ import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.RelativeLayout
 import androidx.annotation.DrawableRes
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.res.use
 import androidx.core.view.isGone
 import eu.darken.fpv.dvca.R
 import eu.darken.fpv.dvca.databinding.ViewPreferenceBinding
 
 open class PreferenceView @JvmOverloads constructor(
-    context: Context?,
+    context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0
-) : RelativeLayout(context, attrs, defStyleAttr) {
-    private var binding: ViewPreferenceBinding
+) : ConstraintLayout(context, attrs, defStyleAttr) {
+
+    private val binding: ViewPreferenceBinding = ViewPreferenceBinding.inflate(LayoutInflater.from(context), this)
 
     init {
-        inflate(getContext(), R.layout.view_preference, this)
-        val padding = resources.getDimensionPixelOffset(R.dimen.padding_16dp)
-        setPadding(padding, padding, padding, padding)
-
-        binding = ViewPreferenceBinding.inflate(LayoutInflater.from(context), this)
-
-
         getContext().theme.obtainStyledAttributes(intArrayOf(android.R.attr.selectableItemBackground)).use {
             background = it.getDrawable(0)
         }
@@ -38,7 +32,6 @@ open class PreferenceView @JvmOverloads constructor(
                 val descId = typedArray.getResourceId(R.styleable.PreferenceView_android_description, 0)
                 if (descId != 0) description.setText(descId) else description.visibility = GONE
             }
-
         }
     }
 

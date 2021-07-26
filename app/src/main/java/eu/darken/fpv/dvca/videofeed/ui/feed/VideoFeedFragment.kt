@@ -15,6 +15,7 @@ import eu.darken.fpv.dvca.common.BuildConfigWrap
 import eu.darken.fpv.dvca.common.hideSystemUI
 import eu.darken.fpv.dvca.common.navigation.doNavigate
 import eu.darken.fpv.dvca.common.observe2
+import eu.darken.fpv.dvca.common.saf.SAFPathPickerContract
 import eu.darken.fpv.dvca.common.showSystemUI
 import eu.darken.fpv.dvca.common.smart.SmartFragment
 import eu.darken.fpv.dvca.common.viewbinding.viewBindingLazy
@@ -74,6 +75,9 @@ class VideoFeedFragment : SmartFragment(R.layout.videofeed_fragment) {
         // Player 1
         binding.apply {
             player1Placeholder.text = getString(R.string.video_feed_player_tease, "1")
+            player1RecordFab.setOnClickListener {
+                vm.onPlayer1RecordToggle()
+            }
 
             vm.google1Feed.observe2(this@VideoFeedFragment) { feed ->
                 Timber.tag(TAG).d("google1Feed.observe2(): %s", feed)
@@ -95,6 +99,7 @@ class VideoFeedFragment : SmartFragment(R.layout.videofeed_fragment) {
                 player1Placeholder.isGone = feed != null
                 player1Canvas.isInvisible = feed == null
                 player1Metadata.isInvisible = feed == null
+                player1RecordFab.isGone = feed == null
             }
         }
 
@@ -103,6 +108,9 @@ class VideoFeedFragment : SmartFragment(R.layout.videofeed_fragment) {
             player2Container.isGone = isInLandscape
 
             player2Placeholder.text = getString(R.string.video_feed_player_tease, "2")
+            player2RecordFab.setOnClickListener {
+                vm.onPlayer2RecordToggle()
+            }
 
             vm.google2Feed.observe2(this@VideoFeedFragment) { feed ->
                 Timber.tag(TAG).d("google2Feed.observe2(): %s", feed)
@@ -125,9 +133,17 @@ class VideoFeedFragment : SmartFragment(R.layout.videofeed_fragment) {
                 player2Placeholder.isGone = feed != null
                 player2Canvas.isInvisible = feed == null
                 player2Metadata.isInvisible = feed == null
+                player2RecordFab.isGone = feed == null
             }
         }
 
+        val safLauncher = registerForActivityResult(SAFPathPickerContract()) {
+            Timber.i("Selected storage uri: %s", it)
+            if (it == null) return@registerForActivityResult
+
+            vm.onStoragePathSelected(it)
+        }
+        vm.dvrStoragePathEvent.observe2(this) { safLauncher.launch(null) }
     }
 
     private fun enterImmersive() {

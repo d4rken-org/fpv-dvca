@@ -6,9 +6,9 @@
     <color name="primary">#0d47a1</color>
     <color name="primaryLight">#5472d3</color>
     <color name="primaryDark">#002171</color>
-    <color name="secondary">#ffea00</color>
-    <color name="secondaryLight">#ffff56</color>
-    <color name="secondaryDark">#c7b800</color>
+    <color name="secondary">#dd2c00</color>
+    <color name="secondaryLight">#ff6434</color>
+    <color name="secondaryDark">#a30000</color>
 
     <color name="colorOnBackground">@color/black</color>
 </resources>

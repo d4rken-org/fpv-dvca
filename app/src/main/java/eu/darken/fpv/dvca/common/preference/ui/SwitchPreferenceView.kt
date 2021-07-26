@@ -6,7 +6,7 @@ import android.view.View
 import androidx.appcompat.widget.SwitchCompat
 
 class SwitchPreferenceView @JvmOverloads constructor(
-    context: Context?,
+    context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0
 ) : PreferenceView(

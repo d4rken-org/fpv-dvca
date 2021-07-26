@@ -38,7 +38,7 @@
         tools:layout="@layout/info_fragment" />
     <fragment
         android:id="@+id/settingsFragment"
-        android:name="eu.darken.fpv.dvca.videofeed.ui.settings.FeedSettingsFragment"
+        android:name="eu.darken.fpv.dvca.main.ui.settings.GeneralSettingsFragment"
         android:label="SettingsFragment"
         tools:layout="@layout/settings_fragment" />
 </navigation>

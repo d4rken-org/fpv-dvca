@@ -29,4 +29,6 @@
     <string name="feedmode_label">Feed mode</string>
     <string name="feedmode_description">Default option for how the video feed should be consumed. Best mode may differ per device.</string>
     <string name="msg_restart_for_effect">Restart app for setting to take effect</string>
+    <string name="dvr_path_label">DVR Storage Path</string>
+    <string name="dvr_path_description">Default storage path for DVR recordings.</string>
 </resources>

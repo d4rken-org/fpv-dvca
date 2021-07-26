@@ -20,17 +20,16 @@ class FFmpegDvrRecorder @Inject constructor(
     // TODO
     override fun record(source: Source, safUri: Uri): DvrRecorder.Session {
 
-        val pipe1 = FFmpegKitConfig.registerNewFFmpegPipe(context)
-//        val pipe2 = FFmpegKitConfig.registerNewFFmpegPipe(context)
+        val inPipe = FFmpegKitConfig.registerNewFFmpegPipe(context)
 
         val ffmpegTarget = FFmpegKitConfig.getSafParameterForWrite(context, safUri)
 
         var recording = true
         thread {
-            FFmpegKit.execute("-fflags nobuffer -f:v h264 -probesize 8192 -i $pipe1 -f mpegts -vcodec copy -preset ultrafast $ffmpegTarget")
+            FFmpegKit.execute("-fflags nobuffer -f:v h264 -probesize 8192 -i $inPipe -f mpegts -vcodec copy -preset ultrafast $ffmpegTarget")
         }
         thread {
-            val ffmpegSink = FileOutputStream(pipe1).sink().buffer()
+            val ffmpegSink = FileOutputStream(inPipe).sink().buffer()
             source.use {
                 val sour = it.buffer()
                 while (recording) {

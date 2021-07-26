@@ -1,9 +1,15 @@
 package eu.darken.fpv.dvca.videofeed.ui.feed
 
+import android.content.Context
+import android.content.Intent
+import android.net.Uri
 import androidx.lifecycle.SavedStateHandle
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import eu.darken.fpv.dvca.App
+import eu.darken.fpv.dvca.common.livedata.SingleLiveEvent
 import eu.darken.fpv.dvca.common.viewmodel.SmartVM
+import eu.darken.fpv.dvca.dvr.GeneralDvrSettings
 import eu.darken.fpv.dvca.gear.GearManager
 import eu.darken.fpv.dvca.gear.goggles.Goggles
 import kotlinx.coroutines.flow.map
@@ -14,7 +20,9 @@ import javax.inject.Inject
 @HiltViewModel
 class VideoFeedVM @Inject constructor(
     private val handle: SavedStateHandle,
-    private val gearManager: GearManager
+    @ApplicationContext private val context: Context,
+    private val gearManager: GearManager,
+    private val dvrSettings: GeneralDvrSettings,
 ) : SmartVM() {
 
     private val goggles = gearManager.availableGear
@@ -57,6 +65,34 @@ class VideoFeedVM @Inject constructor(
         }
         .onEach { Timber.tag(TAG).d("Videofeed 2: %s", it) }
         .asLiveData2()
+
+
+    val dvrStoragePathEvent = SingleLiveEvent<Unit>()
+
+    fun onPlayer1RecordToggle() = launch {
+        if (!requirePathSetup()) return@launch
+    }
+
+
+    fun onPlayer2RecordToggle() = launch {
+        if (!requirePathSetup()) return@launch
+    }
+
+    private fun requirePathSetup(): Boolean {
+        if (dvrSettings.dvrStoragePath.value == null) {
+            dvrStoragePathEvent.postValue(Unit)
+            return false
+        }
+        return true
+    }
+
+    fun onStoragePathSelected(path: Uri) = launch {
+        context.contentResolver.takePersistableUriPermission(
+            path,
+            Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+        )
+        dvrSettings.dvrStoragePath.update { path }
+    }
 
     companion object {
         private val TAG = App.logTag("VideoFeed", "VM")
