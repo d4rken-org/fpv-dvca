@@ -23,7 +23,7 @@ buildscript {
                     'coroutines': '1.5.0-RC-native-mt'
             ],
             'dagger'     : [
-                    'core': '2.35.1'
+                    'core': '2.38.1'
             ],
             'androidx'   : [
                     'navigation': '2.3.5'
@@ -36,7 +36,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath "com.android.tools.build:gradle:4.2.1"
+        classpath 'com.android.tools.build:gradle:7.0.0'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:${versions.kotlin.core}"
         classpath "com.google.dagger:hilt-android-gradle-plugin:${versions.dagger.core}"
         classpath "androidx.navigation:navigation-safe-args-gradle-plugin:${versions.androidx.navigation}"
