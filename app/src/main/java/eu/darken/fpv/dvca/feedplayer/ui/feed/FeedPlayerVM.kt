@@ -10,6 +10,7 @@ import eu.darken.fpv.dvca.App
 import eu.darken.fpv.dvca.common.livedata.SingleLiveEvent
 import eu.darken.fpv.dvca.common.viewmodel.SmartVM
 import eu.darken.fpv.dvca.dvr.GeneralDvrSettings
+import eu.darken.fpv.dvca.dvr.core.DvrController
 import eu.darken.fpv.dvca.feedplayer.core.FeedPlayerSettings
 import eu.darken.fpv.dvca.gear.GearManager
 import eu.darken.fpv.dvca.gear.goggles.Goggles
@@ -25,6 +26,7 @@ class FeedPlayerVM @Inject constructor(
     private val gearManager: GearManager,
     private val dvrSettings: GeneralDvrSettings,
     private val feedPlayerSettings: FeedPlayerSettings,
+    private val dvrController: DvrController,
 ) : SmartVM() {
 
     private val goggles = gearManager.availableGear
@@ -74,20 +76,20 @@ class FeedPlayerVM @Inject constructor(
     val dvrStoragePathEvent = SingleLiveEvent<Unit>()
 
     fun onPlayer1RecordToggle() = launch {
-        if (!requirePathSetup()) return@launch
+        if (pathSetup()) return@launch
+        dvrController.toggleDvr()
     }
-
 
     fun onPlayer2RecordToggle() = launch {
-        if (!requirePathSetup()) return@launch
+        if (pathSetup()) return@launch
     }
 
-    private fun requirePathSetup(): Boolean {
+    private fun pathSetup(): Boolean {
         if (dvrSettings.dvrStoragePath.value == null) {
             dvrStoragePathEvent.postValue(Unit)
-            return false
+            return true
         }
-        return true
+        return false
     }
 
     fun onStoragePathSelected(path: Uri) = launch {
@@ -101,5 +103,4 @@ class FeedPlayerVM @Inject constructor(
     companion object {
         private val TAG = App.logTag("VideoFeed", "VM")
     }
-
 }
