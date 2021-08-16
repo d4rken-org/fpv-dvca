@@ -71,14 +71,17 @@ class FeedPlayerFragment : SmartFragment(R.layout.videofeed_fragment) {
                     else -> super.onOptionsItemSelected(it)
                 }
             }
+
+            playerContainer.orientation = when (isInLandscape) {
+                true -> LinearLayout.HORIZONTAL
+                false -> LinearLayout.VERTICAL
+            }
         }
 
         // Player 1
         binding.apply {
             player1Placeholder.text = getString(R.string.video_feed_player_tease, "1")
-            player1RecordFab.setOnClickListener {
-                vm.onPlayer1RecordToggle()
-            }
+            player1RecordFab.setOnClickListener { vm.onPlayer1RecordToggle() }
 
             vm.google1Feed.observe2(this@FeedPlayerFragment) { feed ->
                 Timber.tag(TAG).d("google1Feed.observe2(): %s", feed)
@@ -106,21 +109,19 @@ class FeedPlayerFragment : SmartFragment(R.layout.videofeed_fragment) {
 
         // Player 2
         binding.apply {
-            playerContainer.orientation = when (isInLandscape) {
-                true -> LinearLayout.HORIZONTAL
-                false -> LinearLayout.VERTICAL
-            }
             player2Container.isGone = isInLandscape && !vm.isMultiplayerInLandscapeAllowed
-
             player2Placeholder.text = getString(R.string.video_feed_player_tease, "2")
-            player2RecordFab.setOnClickListener {
-                vm.onPlayer2RecordToggle()
+            player2RecordFab.setOnClickListener { vm.onPlayer2RecordToggle() }
+
+            if (isInLandscape && !vm.isMultiplayerInLandscapeAllowed) {
+                exoPlayer2.stop()
+                return@apply
             }
 
             vm.google2Feed.observe2(this@FeedPlayerFragment) { feed ->
                 Timber.tag(TAG).d("google2Feed.observe2(): %s", feed)
 
-                if (!isInLandscape && feed != null) {
+                if (feed != null) {
                     exoPlayer2.start(
                         feed = feed,
                         surfaceView = player2Canvas,
