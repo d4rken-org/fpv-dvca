@@ -14,6 +14,8 @@ import eu.darken.fpv.dvca.dvr.core.DvrController
 import eu.darken.fpv.dvca.feedplayer.core.FeedPlayerSettings
 import eu.darken.fpv.dvca.gear.GearManager
 import eu.darken.fpv.dvca.gear.goggles.Goggles
+import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import timber.log.Timber
@@ -38,13 +40,11 @@ class FeedPlayerVM @Inject constructor(
         }
 
     val google1Feed = goggle1
-        .map { goggles1 ->
-            if (goggles1 == null) return@map null
+        .flatMapLatest { goggles1 ->
+            if (goggles1 == null) return@flatMapLatest emptyFlow()
             Timber.tag(TAG).d("Goggle 1 available: %s", goggles1.logId)
 
-            goggles1.videoFeed ?: goggles1.startVideoFeed().also {
-                Timber.tag(TAG).d("Enabling videofeed 1 for %s", goggles1.logId)
-            }
+            goggles1.videoFeed
         }
         .onEach { Timber.tag(TAG).d("Videofeed 1: %s", it) }
         .asLiveData2()
@@ -59,13 +59,11 @@ class FeedPlayerVM @Inject constructor(
         }
 
     val google2Feed = goggle2
-        .map { goggles2 ->
-            if (goggles2 == null) return@map null
+        .flatMapLatest { goggles2 ->
+            if (goggles2 == null) return@flatMapLatest emptyFlow()
             Timber.tag(TAG).d("Goggle 2 available: %s", goggles2.logId)
 
-            goggles2.videoFeed ?: goggles2.startVideoFeed().also {
-                Timber.tag(TAG).d("Enabling videofeed 2 for %s", goggles2.logId)
-            }
+            goggles2.videoFeed
         }
         .onEach { Timber.tag(TAG).d("Videofeed 2: %s", it) }
         .asLiveData2()
@@ -77,7 +75,7 @@ class FeedPlayerVM @Inject constructor(
 
     fun onPlayer1RecordToggle() = launch {
         if (pathSetup()) return@launch
-        dvrController.toggleDvr()
+//        dvrController.toggleDvr()
     }
 
     fun onPlayer2RecordToggle() = launch {

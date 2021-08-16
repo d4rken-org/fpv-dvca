@@ -4,15 +4,12 @@ import com.google.android.exoplayer2.source.MediaSource
 import com.google.android.exoplayer2.upstream.DataSource
 import eu.darken.fpv.dvca.gear.Gear
 import eu.darken.fpv.dvca.usb.connection.HWEndpoint
+import kotlinx.coroutines.flow.Flow
 import okio.Source
 
 interface Goggles : Gear {
 
-    val videoFeed: VideoFeed?
-
-    suspend fun startVideoFeed(): VideoFeed
-
-    suspend fun stopVideoFeed()
+    val videoFeed: Flow<VideoFeed>
 
     interface VideoFeed {
         val source: Source
