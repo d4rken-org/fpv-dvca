@@ -14,10 +14,7 @@ import eu.darken.fpv.dvca.dvr.core.DvrController
 import eu.darken.fpv.dvca.feedplayer.core.FeedPlayerSettings
 import eu.darken.fpv.dvca.gear.GearManager
 import eu.darken.fpv.dvca.gear.goggles.Goggles
-import kotlinx.coroutines.flow.emptyFlow
-import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.*
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -41,10 +38,13 @@ class FeedPlayerVM @Inject constructor(
 
     val google1Feed = goggle1
         .flatMapLatest { goggles1 ->
-            if (goggles1 == null) return@flatMapLatest emptyFlow()
-            Timber.tag(TAG).d("Goggle 1 available: %s", goggles1.logId)
-
-            goggles1.videoFeed
+            if (goggles1 == null) {
+                Timber.tag(TAG).d("Goggle 1 unavailable")
+                flowOf(null)
+            } else {
+                Timber.tag(TAG).d("Goggle 1 available: %s", goggles1.logId)
+                goggles1.videoFeed
+            }
         }
         .onEach { Timber.tag(TAG).d("Videofeed 1: %s", it) }
         .asLiveData2()
@@ -60,10 +60,13 @@ class FeedPlayerVM @Inject constructor(
 
     val google2Feed = goggle2
         .flatMapLatest { goggles2 ->
-            if (goggles2 == null) return@flatMapLatest emptyFlow()
-            Timber.tag(TAG).d("Goggle 2 available: %s", goggles2.logId)
-
-            goggles2.videoFeed
+            if (goggles2 == null) {
+                Timber.tag(TAG).d("Goggle 2 unavailable")
+                flowOf(null)
+            } else {
+                Timber.tag(TAG).d("Goggle 2 available: %s", goggles2.logId)
+                goggles2.videoFeed
+            }
         }
         .onEach { Timber.tag(TAG).d("Videofeed 2: %s", it) }
         .asLiveData2()
