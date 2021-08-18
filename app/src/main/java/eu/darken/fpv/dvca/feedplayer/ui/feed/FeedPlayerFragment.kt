@@ -83,7 +83,8 @@ class FeedPlayerFragment : SmartFragment(R.layout.videofeed_fragment) {
             player1Placeholder.text = getString(R.string.video_feed_player_tease, "1")
             player1RecordFab.setOnClickListener { vm.onPlayer1RecordToggle() }
 
-            vm.google1Feed.observe2(this@FeedPlayerFragment) { feed ->
+            vm.state.observe2(this@FeedPlayerFragment) { state ->
+                val feed = state.feed1
                 Timber.tag(TAG).d("google1Feed.observe2(): %s", feed)
                 if (feed != null) {
                     exoPlayer1.start(
@@ -100,6 +101,9 @@ class FeedPlayerFragment : SmartFragment(R.layout.videofeed_fragment) {
                 } else {
                     exoPlayer1.stop()
                 }
+                player1RecordFab.setImageResource(
+                    if (state.recording1 != null) R.drawable.ic_round_stop_24 else R.drawable.ic_video_file_24
+                )
                 player1Placeholder.isGone = feed != null
                 player1Canvas.isInvisible = feed == null
                 player1Metadata.isInvisible = feed == null
@@ -118,9 +122,9 @@ class FeedPlayerFragment : SmartFragment(R.layout.videofeed_fragment) {
                 return@apply
             }
 
-            vm.google2Feed.observe2(this@FeedPlayerFragment) { feed ->
+            vm.state.observe2(this@FeedPlayerFragment) { state ->
+                val feed = state.feed1
                 Timber.tag(TAG).d("google2Feed.observe2(): %s", feed)
-
                 if (feed != null) {
                     exoPlayer2.start(
                         feed = feed,
@@ -136,6 +140,9 @@ class FeedPlayerFragment : SmartFragment(R.layout.videofeed_fragment) {
                 } else {
                     exoPlayer2.stop()
                 }
+                player2RecordFab.setImageResource(
+                    if (state.recording2 != null) R.drawable.ic_round_stop_24 else R.drawable.ic_video_file_24
+                )
                 player2Placeholder.isGone = feed != null
                 player2Canvas.isInvisible = feed == null
                 player2Metadata.isInvisible = feed == null

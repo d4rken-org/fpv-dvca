@@ -20,7 +20,7 @@ abstract class BaseTestInstrumentation {
         @AfterClass
         fun onTestClassFinished() {
             unmockkAll()
-            Timber.tag(testClassName).v("onTestClassFinished()")
+            Timber.tag(testClassName!!).v("onTestClassFinished()")
             Timber.uprootAll()
         }
     }

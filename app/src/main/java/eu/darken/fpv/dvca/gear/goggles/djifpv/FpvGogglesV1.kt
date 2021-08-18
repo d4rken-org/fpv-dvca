@@ -14,6 +14,7 @@ import eu.darken.fpv.dvca.gear.goggles.VideoFeedSettings
 import eu.darken.fpv.dvca.usb.HWDevice
 import eu.darken.fpv.dvca.usb.connection.HWConnection
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
@@ -30,7 +31,7 @@ class FpvGogglesV1 @AssistedInject constructor(
     dispatcherProvider: DispatcherProvider,
 ) : Goggles {
 
-    private val gearScope = CoroutineScope(context = dispatcherProvider.IO)
+    private val gearScope = CoroutineScope(SupervisorJob() + dispatcherProvider.IO)
     override val firstSeenAt: Instant = Instant.now()
 
     private var wasVideoActive: Boolean = false
