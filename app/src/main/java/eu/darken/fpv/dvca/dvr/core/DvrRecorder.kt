@@ -1,16 +1,16 @@
 package eu.darken.fpv.dvca.dvr.core
 
 import android.net.Uri
-import okio.Source
+import okio.Sink
 
 interface DvrRecorder {
 
-    fun record(source: Source, target: Uri): Session
+    fun record(storagePath: Uri): Session
 
     interface Session {
+        val sink: Sink
 
-        fun stop()
-
+        fun cancel()
     }
 
 }

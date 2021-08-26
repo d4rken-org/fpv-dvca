@@ -31,7 +31,7 @@ class FpvGogglesV1 @AssistedInject constructor(
     dispatcherProvider: DispatcherProvider,
 ) : Goggles {
 
-    private val gearScope = CoroutineScope(SupervisorJob() + dispatcherProvider.IO)
+    override val gearScope = CoroutineScope(SupervisorJob() + dispatcherProvider.IO)
     override val firstSeenAt: Instant = Instant.now()
 
     private var wasVideoActive: Boolean = false
@@ -50,7 +50,6 @@ class FpvGogglesV1 @AssistedInject constructor(
         Timber.tag(TAG).i("Creating videofeed on %s", connection)
         callbackFlow<Goggles.VideoFeed> {
             val feed = FpvGogglesV1VideoFeed(
-                context,
                 connection,
                 usbReadMode = videoFeedSettings.feedModeDefault.value,
             )
