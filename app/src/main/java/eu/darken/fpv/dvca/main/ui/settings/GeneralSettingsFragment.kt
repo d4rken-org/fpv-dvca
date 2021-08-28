@@ -14,6 +14,7 @@ import eu.darken.fpv.dvca.common.saf.SAFPathPickerContract
 import eu.darken.fpv.dvca.common.smart.SmartFragment
 import eu.darken.fpv.dvca.common.viewbinding.viewBindingLazy
 import eu.darken.fpv.dvca.databinding.SettingsFragmentBinding
+import eu.darken.fpv.dvca.dvr.core.DvrMode
 import eu.darken.fpv.dvca.usb.connection.HWEndpoint
 import timber.log.Timber
 
@@ -81,6 +82,27 @@ class GeneralSettingsFragment : SmartFragment(R.layout.settings_fragment) {
             safLauncher.launch(it)
         }
 
+        vm.currentDvrMode.observe2(this) { readMode ->
+            binding.dvrModeDefault.setOnClickListener {
+                MaterialAlertDialogBuilder(requireContext()).apply {
+                    val options = DvrMode.values().map { it.name }.toTypedArray()
+                    setSingleChoiceItems(
+                        options,
+                        options.indexOf(readMode.name)
+                    ) { dif, id ->
+                        vm.updateDvrModeDefault(DvrMode.values().single { it.name == options[id] })
+
+                        Toast.makeText(
+                            requireContext(),
+                            getString(R.string.msg_restart_for_effect),
+                            Toast.LENGTH_LONG
+                        ).show()
+                        dif.dismiss()
+                    }
+
+                }.show()
+            }
+        }
 
         super.onViewCreated(view, savedInstanceState)
     }

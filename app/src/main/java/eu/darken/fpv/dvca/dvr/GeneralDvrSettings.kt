@@ -5,6 +5,7 @@ import android.net.Uri
 import dagger.hilt.android.qualifiers.ApplicationContext
 import eu.darken.fpv.dvca.common.preferences.FlowPreference
 import eu.darken.fpv.dvca.common.preferences.createFlowPreference
+import eu.darken.fpv.dvca.dvr.core.DvrMode
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -24,6 +25,18 @@ class GeneralDvrSettings @Inject constructor(
         },
         writer = { key, value ->
             putString(key, value.toString())
+        }
+    )
+
+    val dvrModeDefault: FlowPreference<DvrMode> = prefs.createFlowPreference(
+        key = "dvr.mode.default",
+        reader = { key ->
+            getString(key, null).let { value ->
+                DvrMode.values().singleOrNull { it.key == value }
+            } ?: DvrMode.FFMPEG
+        },
+        writer = { key, value ->
+            putString(key, value.key)
         }
     )
 }

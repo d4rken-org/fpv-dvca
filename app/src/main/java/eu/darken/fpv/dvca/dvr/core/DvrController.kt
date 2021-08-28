@@ -12,6 +12,7 @@ import eu.darken.fpv.dvca.App
 import eu.darken.fpv.dvca.common.coroutine.AppScope
 import eu.darken.fpv.dvca.common.flow.HotDataFlow
 import eu.darken.fpv.dvca.dvr.GeneralDvrSettings
+import eu.darken.fpv.dvca.dvr.core.direct.DirectDvrRecorder
 import eu.darken.fpv.dvca.dvr.core.ffmpeg.FFmpegDvrRecorder
 import eu.darken.fpv.dvca.dvr.core.service.DvrServiceController
 import eu.darken.fpv.dvca.gear.goggles.Goggles
@@ -29,8 +30,9 @@ class DvrController @Inject constructor(
     @AppScope private val appScope: CoroutineScope,
     @ApplicationContext private val context: Context,
     private val serviceController: DvrServiceController,
-    private val fFmpegDvrRecorder: FFmpegDvrRecorder,
     private val dvrSettings: GeneralDvrSettings,
+    private val dvrRecorderFfmpeg: FFmpegDvrRecorder,
+    private val dvrRecorderDirect: DirectDvrRecorder,
 ) {
 
     private val internalData: HotDataFlow<Set<DvrRecording>> = HotDataFlow(
@@ -77,11 +79,17 @@ class DvrController @Inject constructor(
                         v(TAG) { "Received DVR feed for $goggle: $feed" }
                         currentDvrSession?.cancel()
 
-                        val dvrSession = fFmpegDvrRecorder.record(videoFile.uri)
+                        val dvrSession = when (dvrSettings.dvrModeDefault.value) {
+                            DvrMode.DIRECT_RAW -> dvrRecorderDirect.record(videoFile.uri)
+                            DvrMode.FFMPEG -> dvrRecorderFfmpeg.record(videoFile.uri)
+                        }
                         feed.source.addSideSink(dvrSession.sink.buffer())
                         currentDvrSession = dvrSession
                     }
-                    .onCompletion { d(TAG) { "Feed job was cancelled: $it" } }
+                    .onCompletion {
+                        d(TAG) { "Feed job was cancelled: $it" }
+                        currentDvrSession?.cancel()
+                    }
                     .catch { w(TAG, it) { "DVR feed failed for $goggle" } }
                     .launchIn(goggle.gearScope)
 
