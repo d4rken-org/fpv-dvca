@@ -90,7 +90,7 @@ class DvrController @Inject constructor(
                         DvrMode.DIRECT_RAW -> dvrRecorderDirect.record(videoFile.uri)
                         DvrMode.FFMPEG -> dvrRecorderFfmpeg.record(videoFile.uri)
                     }
-                    feed.source.addSideSink(dvrSession.sink.buffer())
+                    feed.source.addDownStream(dvrSession.sink.buffer())
                     currentDvrSession = dvrSession
                     dvrSession
                 }.first().stats

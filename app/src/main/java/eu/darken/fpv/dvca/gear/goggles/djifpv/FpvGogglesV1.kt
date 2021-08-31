@@ -54,6 +54,8 @@ class FpvGogglesV1 @AssistedInject constructor(
                     connection,
                     usbReadMode = videoFeedSettings.feedModeDefault.value,
                 )
+                feed.open()
+
                 send(feed)
 
                 awaitClose {

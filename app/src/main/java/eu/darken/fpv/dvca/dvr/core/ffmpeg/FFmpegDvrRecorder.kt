@@ -30,7 +30,7 @@ class FFmpegDvrRecorder @Inject constructor(
         val recordingStart = System.currentTimeMillis()
 
         val ffmpegSession = FFmpegKit.executeAsync(
-            "-fflags nobuffer -f:v h264 -framerate 60 -probesize 10000000 -i $inPipe -f mpegts -vcodec copy -preset ultrafast $outFile"
+            "-fflags nobuffer -f:v h264 -framerate 60 -probesize 8192 -i $inPipe -f mpegts -vcodec copy -preset ultrafast $outFile"
         ) {
             v(TAG) { "Session completed:\n$it " }
         }

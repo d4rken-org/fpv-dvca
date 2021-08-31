@@ -4,8 +4,8 @@ import com.google.android.exoplayer2.source.MediaSource
 import dagger.assisted.AssistedInject
 import eu.darken.fpv.dvca.App
 import eu.darken.fpv.dvca.gear.goggles.Goggles
-import eu.darken.fpv.dvca.gear.goggles.common.TeeSource
-import eu.darken.fpv.dvca.gear.goggles.common.tee
+import eu.darken.fpv.dvca.gear.goggles.common.HubSource
+import eu.darken.fpv.dvca.gear.goggles.common.hub
 import eu.darken.fpv.dvca.usb.connection.HWConnection
 import eu.darken.fpv.dvca.usb.connection.HWEndpoint
 import okio.*
@@ -22,9 +22,9 @@ class FpvGogglesV1VideoFeed @AssistedInject constructor(
     private val cmdEndpoint = intf.getEndpoint(0)
     private val videoEndpoint = intf.getEndpoint(1)
     private var cmdSink: BufferedSink? = null
-    private var feedSource: TeeSource? = null
+    private var feedSource: HubSource? = null
 
-    override val source: TeeSource
+    override val source: HubSource
         get() = feedSource!!
 
     override val deviceIdentifier: String
@@ -37,7 +37,7 @@ class FpvGogglesV1VideoFeed @AssistedInject constructor(
     override val videoBufferReadMbs: Double
         get() = videoEndpoint.readStats.bufferReadMbs
 
-    override fun open() {
+    fun open() {
         intf.claim(forced = false)
 
         val cmdSink = cmdEndpoint.sink()
@@ -59,10 +59,10 @@ class FpvGogglesV1VideoFeed @AssistedInject constructor(
         }
 
         this@FpvGogglesV1VideoFeed.cmdSink = cmdSink
-        this@FpvGogglesV1VideoFeed.feedSource = videoSource.tee()
+        this@FpvGogglesV1VideoFeed.feedSource = videoSource.hub()
     }
 
-    override fun close() {
+    fun close() {
         Timber.tag(tag).v("close() feed, this=%s", this)
         cmdSink?.close()
         cmdSink = null
