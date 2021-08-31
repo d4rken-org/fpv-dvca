@@ -74,7 +74,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:description="@string/dvrmode_description"
-            android:icon="@drawable/ic_video_file_24"
+            android:icon="@drawable/ic_baseline_video_settings_24"
             android:title="@string/dvrmode_label" />
     </LinearLayout>
 

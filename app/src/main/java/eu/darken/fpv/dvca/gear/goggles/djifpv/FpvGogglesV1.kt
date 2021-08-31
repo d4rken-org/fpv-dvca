@@ -5,6 +5,7 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.qualifiers.ApplicationContext
+import eu.darken.androidstarter.common.logging.d
 import eu.darken.fpv.dvca.App
 import eu.darken.fpv.dvca.common.coroutine.DispatcherProvider
 import eu.darken.fpv.dvca.common.flow.shareLatest
@@ -17,10 +18,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.awaitClose
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.callbackFlow
-import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.*
 import timber.log.Timber
 import java.time.Instant
 
@@ -44,25 +42,30 @@ class FpvGogglesV1 @AssistedInject constructor(
             Timber.tag(TAG).i("Closing device connection for %s", device)
             connection.close()
         }
-    }.shareLatest(scope = gearScope, started = SharingStarted.WhileSubscribed(replayExpirationMillis = 3000))
+    }
+        .onCompletion { d(TAG) { "onCompletion(): Connect completed for $this: $it" } }
+        .shareLatest(scope = gearScope, started = SharingStarted.WhileSubscribed(replayExpirationMillis = 3000))
 
-    override val videoFeed: Flow<Goggles.VideoFeed> = connection.flatMapLatest { connection ->
-        Timber.tag(TAG).i("Creating videofeed on %s", connection)
-        callbackFlow<Goggles.VideoFeed> {
-            val feed = FpvGogglesV1VideoFeed(
-                connection,
-                usbReadMode = videoFeedSettings.feedModeDefault.value,
-            )
-            send(feed)
+    override val videoFeed: Flow<Goggles.VideoFeed> = connection
+        .flatMapLatest { connection ->
+            Timber.tag(TAG).i("Creating videofeed on %s", connection)
+            callbackFlow<Goggles.VideoFeed> {
+                val feed = FpvGogglesV1VideoFeed(
+                    connection,
+                    usbReadMode = videoFeedSettings.feedModeDefault.value,
+                )
+                send(feed)
 
-            awaitClose {
-                Timber.tag(TAG).i("Closing video feed on %s", connection)
-                feed.close()
+                awaitClose {
+                    Timber.tag(TAG).i("Closing video feed on %s", connection)
+                    feed.close()
 
-                wasVideoActive = false
+                    wasVideoActive = false
+                }
             }
         }
-    }.shareLatest(scope = gearScope, started = SharingStarted.WhileSubscribed(replayExpirationMillis = 3000))
+        .onCompletion { d(TAG) { "onCompletion(): Video feed completed for $this: $it" } }
+        .shareLatest(scope = gearScope, started = SharingStarted.WhileSubscribed(replayExpirationMillis = 3000))
 
     override suspend fun release() {
         Timber.tag(TAG).d("release()")

@@ -81,7 +81,7 @@ class FeedPlayerFragment : SmartFragment(R.layout.videofeed_fragment) {
         // Player 1
         binding.apply {
             player1Placeholder.text = getString(R.string.video_feed_player_tease, "1")
-            player1RecordFab.setOnClickListener { vm.onPlayer1RecordToggle() }
+            player1DvrRecord.setOnClickListener { vm.onPlayer1RecordToggle() }
 
             vm.video1.observe2(this@FeedPlayerFragment) { feed ->
                 Timber.tag(TAG).d("google1Feed.observe2(): %s", feed)
@@ -103,12 +103,17 @@ class FeedPlayerFragment : SmartFragment(R.layout.videofeed_fragment) {
                 player1Placeholder.isGone = feed != null
                 player1Canvas.isInvisible = feed == null
                 player1Metadata.isInvisible = feed == null
-                player1RecordFab.isGone = feed == null
+                player1Dvr.isGone = feed == null
             }
-            vm.dvr1.observe2(this@FeedPlayerFragment) { recording ->
-                player1RecordFab.setImageResource(
-                    if (recording != null) R.drawable.ic_round_stop_24 else R.drawable.ic_video_file_24
+            vm.dvr1.observe2(this@FeedPlayerFragment) { stats ->
+                player1DvrRecord.setImageResource(
+                    if (stats != null) R.drawable.ic_round_stop_24 else R.drawable.ic_video_file_24
                 )
+                player1DvrInfo.isGone = stats == null
+                player1DvrInfo.text = stats?.let {
+                    val seconds = it.length.inWholeSeconds
+                    String.format("%02dm %02ds", (seconds % 3600) / 60, (seconds % 60))
+                }
             }
         }
 
@@ -116,7 +121,7 @@ class FeedPlayerFragment : SmartFragment(R.layout.videofeed_fragment) {
         binding.apply {
             player2Container.isGone = isInLandscape && !vm.isMultiplayerInLandscapeAllowed
             player2Placeholder.text = getString(R.string.video_feed_player_tease, "2")
-            player2RecordFab.setOnClickListener { vm.onPlayer2RecordToggle() }
+            player2DvrRecord.setOnClickListener { vm.onPlayer2RecordToggle() }
 
             if (isInLandscape && !vm.isMultiplayerInLandscapeAllowed) {
                 exoPlayer2.stop()
@@ -143,12 +148,17 @@ class FeedPlayerFragment : SmartFragment(R.layout.videofeed_fragment) {
                 player2Placeholder.isGone = feed != null
                 player2Canvas.isInvisible = feed == null
                 player2Metadata.isInvisible = feed == null
-                player2RecordFab.isGone = feed == null
+                player2Dvr.isGone = feed == null
             }
-            vm.dvr2.observe2(this@FeedPlayerFragment) { recording ->
-                player2RecordFab.setImageResource(
-                    if (recording != null) R.drawable.ic_round_stop_24 else R.drawable.ic_video_file_24
+            vm.dvr2.observe2(this@FeedPlayerFragment) { stats ->
+                player2DvrRecord.setImageResource(
+                    if (stats != null) R.drawable.ic_round_stop_24 else R.drawable.ic_video_file_24
                 )
+                player2DvrInfo.isGone = stats == null
+                player2DvrInfo.text = stats?.let {
+                    val seconds = it.length.inWholeSeconds
+                    String.format("%02dm %02ds", (seconds % 3600) / 60, (seconds % 60))
+                }
             }
         }
 

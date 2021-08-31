@@ -3,6 +3,7 @@ package eu.darken.fpv.dvca.dvr.core
 import android.net.Uri
 import kotlinx.coroutines.flow.Flow
 import okio.Sink
+import kotlin.time.Duration
 
 interface DvrRecorder {
 
@@ -14,7 +15,7 @@ interface DvrRecorder {
         val stats: Flow<Stats>
 
         data class Stats(
-            val length: Long,
+            val length: Duration,
             val size: Long,
         )
 

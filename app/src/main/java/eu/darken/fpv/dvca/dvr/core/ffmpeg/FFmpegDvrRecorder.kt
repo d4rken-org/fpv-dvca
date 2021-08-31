@@ -16,31 +16,35 @@ import okio.Sink
 import okio.appendingSink
 import java.io.File
 import javax.inject.Inject
+import kotlin.time.Duration
 
 class FFmpegDvrRecorder @Inject constructor(
     @ApplicationContext private val context: Context
 ) : DvrRecorder {
 
-    override fun record(safUri: Uri): DvrRecorder.Session {
+    override fun record(storagePath: Uri): DvrRecorder.Session {
         val inPipe = FFmpegKitConfig.registerNewFFmpegPipe(context)
-        val outFile = FFmpegKitConfig.getSafParameterForWrite(context, safUri)
+        val outFile = FFmpegKitConfig.getSafParameterForWrite(context, storagePath)
         i(TAG) { "Starting FFmpeg: IN=$inPipe OUT=$outFile" }
 
         val recordingStart = System.currentTimeMillis()
 
         val ffmpegSession = FFmpegKit.executeAsync(
-            "-fflags nobuffer -f:v h264 -probesize 8192 -i $inPipe -f mpegts -vcodec copy -preset ultrafast $outFile"
+            "-fflags nobuffer -f:v h264 -framerate 60 -probesize 8192 -i $inPipe -f mpegts -vcodec copy -preset ultrafast $outFile"
         ) {
             v(TAG) { "Session completed:\n$it " }
         }
 
+        val targetSink = File(inPipe).appendingSink()
+
         return object : DvrRecorder.Session {
-            override val sink: Sink = File(inPipe).appendingSink()
+            override val sink: Sink = targetSink
+
             override val stats: Flow<DvrRecorder.Session.Stats> = flow {
                 while (true) {
                     emit(
                         DvrRecorder.Session.Stats(
-                            length = (System.currentTimeMillis() - recordingStart) / 1000L,
+                            length = Duration.milliseconds(System.currentTimeMillis() - recordingStart),
                             size = 0L
                         )
                     )
@@ -49,8 +53,10 @@ class FFmpegDvrRecorder @Inject constructor(
             }
 
             override fun cancel() {
-                i(TAG) { "Canceling session" }
-                v(TAG) { "Cancelled sesion:\n$ffmpegSession" }
+                i(TAG) { "Cancelling session" }
+                v(TAG) { "Closing ffmpegSink:\n$ffmpegSession" }
+                targetSink.close()
+                v(TAG) { "Cancelled session:\n$ffmpegSession" }
                 ffmpegSession.cancel()
             }
         }

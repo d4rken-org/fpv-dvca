@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.flow
 import okio.Sink
 import okio.sink
 import javax.inject.Inject
+import kotlin.time.Duration
 
 class DirectDvrRecorder @Inject constructor(
     @ApplicationContext private val context: Context
@@ -21,16 +22,16 @@ class DirectDvrRecorder @Inject constructor(
         i(TAG) { "Starting direct recording to $storagePath" }
         val recordingStart = System.currentTimeMillis()
 
-        val outputStream = context.contentResolver.openOutputStream(storagePath)!!
+        val targetSink = context.contentResolver.openOutputStream(storagePath)!!.sink()
 
         return object : DvrRecorder.Session {
-            override val sink: Sink = outputStream.sink()
+            override val sink: Sink = targetSink
 
             override val stats: Flow<DvrRecorder.Session.Stats> = flow {
                 while (true) {
                     emit(
                         DvrRecorder.Session.Stats(
-                            length = (System.currentTimeMillis() - recordingStart) / 1000L,
+                            length = Duration.milliseconds(System.currentTimeMillis() - recordingStart),
                             size = 0L
                         )
                     )
@@ -39,8 +40,8 @@ class DirectDvrRecorder @Inject constructor(
             }
 
             override fun cancel() {
-                i(TAG) { "Canceling session" }
-                outputStream.close()
+                i(TAG) { "Cancelling session" }
+                targetSink.close()
             }
         }
     }

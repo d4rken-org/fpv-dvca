@@ -57,7 +57,11 @@ class FeedPlayerVM @Inject constructor(
 
     val dvr1 = combine(goggle1, dvrController.recordings) { g1, recordings ->
         recordings.singleOrNull { it.goggle == g1 }
-    }.asLiveData2()
+    }
+        .flatMapLatest {
+            it?.stats ?: flowOf(null)
+        }
+        .asLiveData2()
 
     private val goggle2 = goggles
         .map { gears ->
@@ -85,7 +89,11 @@ class FeedPlayerVM @Inject constructor(
 
     val dvr2 = combine(goggle2, dvrController.recordings) { g2, recordings ->
         recordings.singleOrNull { it.goggle == g2 }
-    }.asLiveData2()
+    }
+        .flatMapLatest {
+            it?.stats ?: flowOf(null)
+        }
+        .asLiveData2()
 
     val isMultiplayerInLandscapeAllowed: Boolean
         get() = feedPlayerSettings.isLandscapeMultiplayerEnabled.value

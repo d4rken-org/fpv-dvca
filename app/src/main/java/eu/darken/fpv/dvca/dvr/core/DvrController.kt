@@ -75,17 +75,6 @@ class DvrController @Inject constructor(
 
                 // While the recording is running, we keep collecting, otherwise the feed is stopped.
                 val feedJob = goggle.videoFeed
-                    .onEach { feed ->
-                        v(TAG) { "Received DVR feed for $goggle: $feed" }
-                        currentDvrSession?.cancel()
-
-                        val dvrSession = when (dvrSettings.dvrModeDefault.value) {
-                            DvrMode.DIRECT_RAW -> dvrRecorderDirect.record(videoFile.uri)
-                            DvrMode.FFMPEG -> dvrRecorderFfmpeg.record(videoFile.uri)
-                        }
-                        feed.source.addSideSink(dvrSession.sink.buffer())
-                        currentDvrSession = dvrSession
-                    }
                     .onCompletion {
                         d(TAG) { "Feed job was cancelled: $it" }
                         currentDvrSession?.cancel()
@@ -93,9 +82,23 @@ class DvrController @Inject constructor(
                     .catch { w(TAG, it) { "DVR feed failed for $goggle" } }
                     .launchIn(goggle.gearScope)
 
+                val stats = goggle.videoFeed.map { feed ->
+                    v(TAG) { "Received DVR feed for $goggle: $feed" }
+                    currentDvrSession?.cancel()
+
+                    val dvrSession = when (dvrSettings.dvrModeDefault.value) {
+                        DvrMode.DIRECT_RAW -> dvrRecorderDirect.record(videoFile.uri)
+                        DvrMode.FFMPEG -> dvrRecorderFfmpeg.record(videoFile.uri)
+                    }
+                    feed.source.addSideSink(dvrSession.sink.buffer())
+                    currentDvrSession = dvrSession
+                    dvrSession
+                }.first().stats
+
                 val newRecording = DvrRecording(
                     goggle = goggle,
                     feedJob = feedJob,
+                    stats = stats,
                 )
 
                 i(TAG) { "Started DvrRecording: $newRecording" }
@@ -111,6 +114,7 @@ class DvrController @Inject constructor(
     data class DvrRecording(
         val goggle: Goggles,
         val feedJob: Job,
+        val stats: Flow<DvrRecorder.Session.Stats>,
         val recordingId: String = UUID.randomUUID().toString(),
         val startedAt: Instant = Instant.now(),
     ) {
