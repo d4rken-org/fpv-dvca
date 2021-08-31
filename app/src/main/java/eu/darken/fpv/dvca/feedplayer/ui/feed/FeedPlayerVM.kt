@@ -100,8 +100,12 @@ class FeedPlayerVM @Inject constructor(
 
     val dvrStoragePathEvent = SingleLiveEvent<Unit>()
 
+    private var outStandingToggle = 0
     fun onPlayer1RecordToggle() = launch {
-        if (pathSetup()) return@launch
+        if (pathSetup()) {
+            outStandingToggle = 1
+            return@launch
+        }
 
         val goggle = goggle1.first()
         if (goggle == null) {
@@ -115,7 +119,20 @@ class FeedPlayerVM @Inject constructor(
     }
 
     fun onPlayer2RecordToggle() = launch {
-        if (pathSetup()) return@launch
+        if (pathSetup()) {
+            outStandingToggle = 2
+            return@launch
+        }
+
+        val goggle = goggle2.first()
+        if (goggle == null) {
+            w(TAG) { "Can't start Goggle 2 DVR, was null!" }
+            return@launch
+        } else {
+            i(TAG) { "onPlayer2RecordToggle(): goggle=$goggle" }
+        }
+
+        val recording = dvrController.toggle(goggle)
     }
 
     private fun pathSetup(): Boolean {
@@ -132,6 +149,12 @@ class FeedPlayerVM @Inject constructor(
             Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
         )
         dvrSettings.dvrStoragePath.update { path }
+        val toToggle = outStandingToggle
+        outStandingToggle = 0
+        when (toToggle) {
+            1 -> onPlayer1RecordToggle()
+            2 -> onPlayer2RecordToggle()
+        }
     }
 
     companion object {
