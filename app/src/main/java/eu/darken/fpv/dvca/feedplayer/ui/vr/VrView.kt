@@ -8,6 +8,7 @@ import android.view.*
 import android.widget.FrameLayout
 import eu.darken.androidstarter.common.logging.d
 import eu.darken.androidstarter.common.logging.w
+import eu.darken.fpv.dvca.App
 import eu.darken.fpv.dvca.R
 import eu.darken.fpv.dvca.feedplayer.core.vr.gl.EglCore
 import eu.darken.fpv.dvca.feedplayer.core.vr.gl.FullFrameRect
@@ -56,7 +57,7 @@ class VrView @JvmOverloads constructor(
                     makeCurrent()
                 }
                 surface = Surface(videoSurfaceTexture)
-                d { "EYE-Left is ready" }
+                d(TAG) { "EYE-Left is ready" }
             }
 
             override fun surfaceChanged(holder: SurfaceHolder, format: Int, width: Int, height: Int) {}
@@ -65,7 +66,7 @@ class VrView @JvmOverloads constructor(
         surfaceViewRight.holder.addCallback(object : SurfaceHolder.Callback {
             override fun surfaceCreated(holder: SurfaceHolder) {
                 rightEyeSurface = WindowSurface(eglCore, holder.surface, false)
-                d { "EYE-Right is ready" }
+                d(TAG) { "EYE-Right is ready" }
             }
 
             override fun surfaceChanged(holder: SurfaceHolder, format: Int, width: Int, height: Int) {}
@@ -73,8 +74,14 @@ class VrView @JvmOverloads constructor(
         })
     }
 
+    override fun onFinishInflate() {
+        d(TAG) { "onFinishInflate()" }
+        super.onFinishInflate()
+        d(TAG) { "onFinishInflate()'ed" }
+    }
+
     fun release() {
-        d { "release()" }
+        d(TAG) { "release()" }
         isReleased = true
 
         surface.release()
@@ -87,7 +94,7 @@ class VrView @JvmOverloads constructor(
 
     override fun onFrameAvailable(surfaceTexture: SurfaceTexture) {
         if (isReleased) {
-            w { "Skipping frame drawing, surface is released." }
+            w(TAG) { "Skipping frame drawing, surface is released." }
             return
         }
 
@@ -107,6 +114,10 @@ class VrView @JvmOverloads constructor(
 
         fullFrameBlit.drawFrame(textureId, transformMatrix)
         swapBuffers()
+    }
+
+    companion object {
+        private val TAG = App.logTag("VrFeed", "VrView")
     }
 }
 
