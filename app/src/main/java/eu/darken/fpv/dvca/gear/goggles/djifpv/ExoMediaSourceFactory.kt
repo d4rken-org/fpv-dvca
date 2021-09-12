@@ -6,7 +6,7 @@ import com.google.android.exoplayer2.extractor.ExtractorsFactory
 import com.google.android.exoplayer2.source.MediaSource
 import com.google.android.exoplayer2.source.ProgressiveMediaSource
 import com.google.android.exoplayer2.upstream.DataSource
-import eu.darken.fpv.dvca.feedplayer.core.player.exo.H264Extractor2
+import eu.darken.fpv.dvca.feedplayer.core.common.H264Extractor2
 import eu.darken.fpv.dvca.gear.goggles.Goggles
 import eu.darken.fpv.dvca.usb.connection.HWEndpoint
 

@@ -1,31 +1,25 @@
-package eu.darken.fpv.dvca.feedplayer.core.player.exo
+package eu.darken.fpv.dvca.feedplayer.core.vr
 
 import android.content.Context
-import android.view.SurfaceView
 import com.google.android.exoplayer2.*
 import dagger.hilt.android.qualifiers.ApplicationContext
 import eu.darken.fpv.dvca.App
-import eu.darken.fpv.dvca.feedplayer.core.player.FeedPlayer
+import eu.darken.fpv.dvca.feedplayer.ui.vr.VrView
 import eu.darken.fpv.dvca.gear.goggles.Goggles
 import timber.log.Timber
 import javax.inject.Inject
 
-class ExoFeedPlayer @Inject constructor(
+class VrFeedPlayer @Inject constructor(
     @ApplicationContext private val context: Context,
-) : FeedPlayer {
+) {
 
-    private val tag = App.logTag("Video", "Player", hashCode().toString())
+    private val tag = App.logTag("VrFeed", "Player", hashCode().toString())
 
     private val loadControl = DefaultLoadControl.Builder().apply {
         setBufferDurationsMs(100, 1000, 100, 100)
     }.build()
 
-    private val renderersFactory = CustomRendererFactory(
-        context,
-        renderInfoListener = { info ->
-            renderInfoListeners.forEach { it(info) }
-        }
-    )
+    private val renderersFactory = DefaultRenderersFactory(context)
 
     private val player = SimpleExoPlayer.Builder(context, renderersFactory).apply {
         setLoadControl(loadControl)
@@ -34,29 +28,22 @@ class ExoFeedPlayer @Inject constructor(
         setUseLazyPreparation(true)
     }.build()
 
-    private val renderInfoListeners = mutableListOf<(RenderInfo) -> Unit>()
-
-    override val isPlaying: Boolean
+    val isPlaying: Boolean
         get() = player.run { isPlaying || isLoading }
 
-    override fun start(
+    fun start(
         feed: Goggles.VideoFeed,
-        surfaceView: SurfaceView,
-        renderInfoListener: (RenderInfo) -> Unit
+        vrView: VrView,
     ) {
-        Timber.tag(tag).d("start(source=%s, view=%s)", feed, surfaceView)
+        Timber.tag(tag).d("start(source=%s, surface=%s)", feed, vrView.surface)
 
         if (isPlaying) {
             Timber.tag(tag).w("Already playing? Stopping!")
             stop()
         }
 
-        renderInfoListeners.add { info ->
-            surfaceView.post { renderInfoListener(info) }
-        }
-
         player.apply {
-            setVideoSurfaceView(surfaceView)
+            setVideoSurface(vrView.surface)
             setMediaSource(feed.exoMediaSource)
 
             addListener(object : Player.Listener {
@@ -73,12 +60,11 @@ class ExoFeedPlayer @Inject constructor(
         }
     }
 
-    override fun stop() {
+    fun stop() {
         Timber.tag(tag).d("stop()")
         player.apply {
             stop()
             clearMediaItems()
         }
-        renderInfoListeners.clear()
     }
 }

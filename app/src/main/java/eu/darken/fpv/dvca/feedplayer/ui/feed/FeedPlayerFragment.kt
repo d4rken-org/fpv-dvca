@@ -21,8 +21,8 @@ import eu.darken.fpv.dvca.common.showSystemUI
 import eu.darken.fpv.dvca.common.smart.SmartFragment
 import eu.darken.fpv.dvca.common.viewbinding.viewBindingLazy
 import eu.darken.fpv.dvca.databinding.VideofeedFragmentBinding
-import eu.darken.fpv.dvca.feedplayer.core.player.exo.ExoFeedPlayer
-import eu.darken.fpv.dvca.feedplayer.core.player.exo.RenderInfo
+import eu.darken.fpv.dvca.feedplayer.core.exo.ExoFeedPlayer
+import eu.darken.fpv.dvca.feedplayer.core.exo.RenderInfo
 import eu.darken.fpv.dvca.gear.goggles.Goggles
 import timber.log.Timber
 import javax.inject.Inject
@@ -55,6 +55,10 @@ class FeedPlayerFragment : SmartFragment(R.layout.videofeed_fragment) {
             toolbar.inflateMenu(R.menu.feedplayer_menu)
             toolbar.setOnMenuItemClickListener {
                 when (it.itemId) {
+                    R.id.vrmode -> {
+                        doNavigate(FeedPlayerFragmentDirections.actionVideoFeedFragmentToVrFragment())
+                        true
+                    }
                     R.id.settings -> {
                         doNavigate(FeedPlayerFragmentDirections.actionVideoFeedFragmentToSettingsFragment())
                         true

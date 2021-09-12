@@ -1,4 +1,4 @@
-package eu.darken.fpv.dvca.feedplayer.core.player.exo
+package eu.darken.fpv.dvca.feedplayer.core.common
 
 import com.google.android.exoplayer2.C
 import com.google.android.exoplayer2.extractor.Extractor
