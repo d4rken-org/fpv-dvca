@@ -1,8 +1,8 @@
 # fpv-dvca
-![Build](https://github.com/d4rken/fpv-dvca/actions/workflows/android/badge.svg)
+![Build](https://github.com/d4rken/fpv-dvca/actions/workflows/android.yml/badge.svg)
 
-An unofficial companion app for DJI's Digital FPV System for Android devices.
-Plug your Android device into your Googles and watch a live feed on your phone.
+An unofficial companion app for DJI's Digital FPV System for Android devices. Plug your Android device into your Googles
+and watch a live feed on your phone.
 
 If this app doesn't tickle your fancy, maybe [this one](https://github.com/fpvout/DigiView-Android) from [@jlucidar](https://github.com/jlucidar) does.
 
