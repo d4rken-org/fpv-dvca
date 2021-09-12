@@ -29,7 +29,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="16dp"
                 android:layout_marginTop="16dp"
-                android:text="Playback"
+                android:text="@string/settings_label_player"
                 android:textColor="@color/secondary" />
 
             <eu.darken.fpv.dvca.common.preference.ui.SwitchPreferenceView
@@ -46,7 +46,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="16dp"
                 android:layout_marginTop="16dp"
-                android:text="USB"
+                android:text="@string/settings_label_usb"
                 android:textColor="@color/secondary" />
 
             <eu.darken.fpv.dvca.common.preference.ui.PreferenceView
@@ -63,7 +63,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="16dp"
                 android:layout_marginTop="16dp"
-                android:text="DVR"
+                android:text="@string/settings_label_dvr"
                 android:textColor="@color/secondary" />
 
             <eu.darken.fpv.dvca.common.preference.ui.PreferenceView
