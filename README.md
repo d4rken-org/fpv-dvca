@@ -17,7 +17,7 @@ and watch a live feed on your Android device.
 * [GitHub](https://github.com/d4rken/fpv-dvca/releases/latest)
 
 ## Community
-Want to chat? There is a [discord server here]().
+Want to chat? There is a [discord server here](https://discord.gg/q5gHFXAs9e).
 Be nice. No is getting paid to do any of this, we all just like FPV ([you can send me a ☕ though 😉](https://www.buymeacoffee.com/tydarken)).
 
 If this app doesn't tickle your fancy, maybe [this one](https://github.com/fpvout/DigiView-Android) does.
