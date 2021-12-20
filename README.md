@@ -1,6 +1,6 @@
 # FPV DVCA 
 ![Build](https://github.com/d4rken/fpv-dvca/actions/workflows/android.yml/badge.svg)
-[![Github All Releases](https://img.shields.io/github/downloads/d4rken/fpv-dvca/total.svg)]()
+[![Github All Releases](https://img.shields.io/github/downloads/d4rken/fpv-dvca/total.svg)](https://github.com/d4rken/fpv-dvca/releases/latest)
 
 DVCA (Digital Video Companion App) is an unofficial Android app for DJI's Digital FPV System. Plug your Android device into your Goggles
 and watch a live feed on your Android device.
