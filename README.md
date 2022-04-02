@@ -29,4 +29,4 @@ Shout out to:
 * D3VL who founded the [community](https://discord.gg/q5gHFXAs9e) around fpv-out
 
 ## Screenshots
-<img src="https://raw.githubusercontent.com/d4rken/fpv-dvca/main/.media/screenshot-land.png" width="200"><img src="https://raw.githubusercontent.com/d4rken/fpv-dvca/main/.media/screenshoto-port.png" width="200"><img src="https://raw.githubusercontent.com/d4rken/fpv-dvca/main/.media/screenshot-vrmode.png" width="200">
+<img src="https://raw.githubusercontent.com/d4rken/fpv-dvca/main/.media/screenshot-land.png" width="200"><img src="https://raw.githubusercontent.com/d4rken/fpv-dvca/main/.media/screenshoto-port.png" width="200"><img src="https://raw.githubusercontent.com/d4rken/fpv-dvca/main/.media/screenshot-vrmode.png" width="200"><img src="https://github.com/d4rken/fpv-dvca/blob/main/.media/screenshot-port2.jpg" width="200">
