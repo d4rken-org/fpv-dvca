@@ -9,7 +9,6 @@ import android.provider.DocumentsContract
 import androidx.activity.result.contract.ActivityResultContract
 import androidx.annotation.RequiresApi
 import eu.darken.fpv.dvca.common.BuildVersionWrap
-import eu.darken.fpv.dvca.common.hasAPILevel
 
 class SAFPathPickerContract : ActivityResultContract<Uri?, Uri?>() {
 

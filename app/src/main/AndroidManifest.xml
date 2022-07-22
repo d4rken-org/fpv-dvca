@@ -3,6 +3,7 @@
     package="eu.darken.fpv.dvca">
 
     <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 
     <uses-feature
         android:name="android.hardware.usb.host"
@@ -10,7 +11,7 @@
 
     <application
         android:name=".App"
-        android:allowBackup="true"
+        android:allowBackup="false"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name_short"
         android:roundIcon="@mipmap/ic_launcher_round"
@@ -20,7 +21,8 @@
             android:name=".main.ui.MainActivity"
             android:label="@string/app_name_short"
             android:launchMode="singleTop"
-            android:theme="@style/Theme.LauncherToMainActivity">
+            android:theme="@style/Theme.LauncherToMainActivity"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -36,13 +38,16 @@
                 android:resource="@xml/usb_device_filter" />
         </activity>
 
-        <receiver android:name=".usb.manager.UsbDeviceEventReceiver">
+        <receiver
+            android:name=".usb.manager.UsbDeviceEventReceiver"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.hardware.usb.action.USB_STATE" />
                 <action android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED" />
                 <action android:name="android.hardware.usb.action.USB_DEVICE_DETACHED" />
             </intent-filter>
         </receiver>
+        <service android:name=".dvr.core.service.DvrService" />
     </application>
 
 </manifest>

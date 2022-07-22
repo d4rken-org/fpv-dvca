@@ -4,17 +4,21 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import androidx.lifecycle.SavedStateHandle
+import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import eu.darken.androidstarter.common.logging.i
+import eu.darken.androidstarter.common.logging.w
 import eu.darken.fpv.dvca.App
+import eu.darken.fpv.dvca.common.flow.combine
 import eu.darken.fpv.dvca.common.livedata.SingleLiveEvent
 import eu.darken.fpv.dvca.common.viewmodel.SmartVM
 import eu.darken.fpv.dvca.dvr.GeneralDvrSettings
+import eu.darken.fpv.dvca.dvr.core.DvrController
 import eu.darken.fpv.dvca.feedplayer.core.FeedPlayerSettings
 import eu.darken.fpv.dvca.gear.GearManager
 import eu.darken.fpv.dvca.gear.goggles.Goggles
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.*
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -25,6 +29,7 @@ class FeedPlayerVM @Inject constructor(
     private val gearManager: GearManager,
     private val dvrSettings: GeneralDvrSettings,
     private val feedPlayerSettings: FeedPlayerSettings,
+    private val dvrController: DvrController,
 ) : SmartVM() {
 
     private val goggles = gearManager.availableGear
@@ -35,16 +40,27 @@ class FeedPlayerVM @Inject constructor(
             gears.minByOrNull { it.firstSeenAt }
         }
 
-    val google1Feed = goggle1
-        .map { goggles1 ->
-            if (goggles1 == null) return@map null
-            Timber.tag(TAG).d("Goggle 1 available: %s", goggles1.logId)
-
-            goggles1.videoFeed ?: goggles1.startVideoFeed().also {
-                Timber.tag(TAG).d("Enabling videofeed 1 for %s", goggles1.logId)
+    private val goggle1Feed: Flow<Goggles.VideoFeed?> = goggle1
+        .flatMapLatest { goggles1 ->
+            if (goggles1 == null) {
+                Timber.tag(TAG).d("Goggle 1 unavailable")
+                flowOf(null)
+            } else {
+                Timber.tag(TAG).d("Goggle 1 available: %s", goggles1.logId)
+                goggles1.videoFeed
             }
         }
         .onEach { Timber.tag(TAG).d("Videofeed 1: %s", it) }
+        .shareIn(viewModelScope, SharingStarted.WhileSubscribed(), replay = 1)
+
+    val video1 = goggle1Feed.asLiveData2()
+
+    val dvr1 = combine(goggle1, dvrController.recordings) { g1, recordings ->
+        recordings.singleOrNull { it.goggle == g1 }
+    }
+        .flatMapLatest {
+            it?.stats ?: flowOf(null)
+        }
         .asLiveData2()
 
     private val goggle2 = goggles
@@ -56,16 +72,27 @@ class FeedPlayerVM @Inject constructor(
             }
         }
 
-    val google2Feed = goggle2
-        .map { goggles2 ->
-            if (goggles2 == null) return@map null
-            Timber.tag(TAG).d("Goggle 2 available: %s", goggles2.logId)
-
-            goggles2.videoFeed ?: goggles2.startVideoFeed().also {
-                Timber.tag(TAG).d("Enabling videofeed 2 for %s", goggles2.logId)
+    private val google2Feed = goggle2
+        .flatMapLatest { goggles2 ->
+            if (goggles2 == null) {
+                Timber.tag(TAG).d("Goggle 2 unavailable")
+                flowOf(null)
+            } else {
+                Timber.tag(TAG).d("Goggle 2 available: %s", goggles2.logId)
+                goggles2.videoFeed
             }
         }
         .onEach { Timber.tag(TAG).d("Videofeed 2: %s", it) }
+        .shareIn(viewModelScope, SharingStarted.WhileSubscribed(), replay = 1)
+
+    val video2 = google2Feed.asLiveData2()
+
+    val dvr2 = combine(goggle2, dvrController.recordings) { g2, recordings ->
+        recordings.singleOrNull { it.goggle == g2 }
+    }
+        .flatMapLatest {
+            it?.stats ?: flowOf(null)
+        }
         .asLiveData2()
 
     val isMultiplayerInLandscapeAllowed: Boolean
@@ -73,21 +100,47 @@ class FeedPlayerVM @Inject constructor(
 
     val dvrStoragePathEvent = SingleLiveEvent<Unit>()
 
+    private var outStandingToggle = 0
     fun onPlayer1RecordToggle() = launch {
-        if (!requirePathSetup()) return@launch
-    }
+        if (pathSetup()) {
+            outStandingToggle = 1
+            return@launch
+        }
 
+        val goggle = goggle1.first()
+        if (goggle == null) {
+            w(TAG) { "Can't start Goggle 1 DVR, was null!" }
+            return@launch
+        } else {
+            i(TAG) { "onPlayer1RecordToggle(): goggle=$goggle" }
+        }
+
+        val recording = dvrController.toggle(goggle)
+    }
 
     fun onPlayer2RecordToggle() = launch {
-        if (!requirePathSetup()) return@launch
+        if (pathSetup()) {
+            outStandingToggle = 2
+            return@launch
+        }
+
+        val goggle = goggle2.first()
+        if (goggle == null) {
+            w(TAG) { "Can't start Goggle 2 DVR, was null!" }
+            return@launch
+        } else {
+            i(TAG) { "onPlayer2RecordToggle(): goggle=$goggle" }
+        }
+
+        val recording = dvrController.toggle(goggle)
     }
 
-    private fun requirePathSetup(): Boolean {
+    private fun pathSetup(): Boolean {
         if (dvrSettings.dvrStoragePath.value == null) {
             dvrStoragePathEvent.postValue(Unit)
-            return false
+            return true
         }
-        return true
+        return false
     }
 
     fun onStoragePathSelected(path: Uri) = launch {
@@ -96,10 +149,15 @@ class FeedPlayerVM @Inject constructor(
             Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
         )
         dvrSettings.dvrStoragePath.update { path }
+        val toToggle = outStandingToggle
+        outStandingToggle = 0
+        when (toToggle) {
+            1 -> onPlayer1RecordToggle()
+            2 -> onPlayer2RecordToggle()
+        }
     }
 
     companion object {
         private val TAG = App.logTag("VideoFeed", "VM")
     }
-
 }

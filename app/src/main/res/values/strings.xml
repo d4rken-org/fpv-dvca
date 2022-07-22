@@ -33,4 +33,10 @@
     <string name="dvr_path_description">Default storage path for DVR recordings.</string>
     <string name="playback_multiplayer_landscape_label">Landscape multiplayer</string>
     <string name="playback_multiplayer_landscape_description">Display multiple player feeds in landscape mode.</string>
+    <string name="dvrmode_label">DVR mode</string>
+    <string name="dvrmode_description">Default mode for DVR processing. Affects video data is processed and written to disk.</string>
+    <string name="settings_label_dvr">DVR</string>
+    <string name="settings_label_usb">USB</string>
+    <string name="settings_label_player">Player</string>
+    <string name="label_vrmode">VR Mode</string>
 </resources>

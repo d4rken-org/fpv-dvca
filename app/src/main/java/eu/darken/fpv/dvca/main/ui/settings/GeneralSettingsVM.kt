@@ -5,6 +5,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import eu.darken.fpv.dvca.common.livedata.SingleLiveEvent
 import eu.darken.fpv.dvca.common.viewmodel.SmartVM
 import eu.darken.fpv.dvca.dvr.GeneralDvrSettings
+import eu.darken.fpv.dvca.dvr.core.DvrMode
 import eu.darken.fpv.dvca.feedplayer.core.FeedPlayerSettings
 import eu.darken.fpv.dvca.gear.goggles.VideoFeedSettings
 import eu.darken.fpv.dvca.usb.connection.HWEndpoint
@@ -38,5 +39,11 @@ class GeneralSettingsVM @Inject constructor(
 
     fun onNewStoragePath(path: Uri) {
         dvrSettings.dvrStoragePath.update { path }
+    }
+
+    val currentDvrMode = dvrSettings.dvrModeDefault.flow.asLiveData2()
+
+    fun updateDvrModeDefault(mode: DvrMode) {
+        dvrSettings.dvrModeDefault.update { mode }
     }
 }

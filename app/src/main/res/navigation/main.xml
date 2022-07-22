@@ -18,6 +18,19 @@
         <action
             android:id="@+id/action_videoFeedFragment_to_onboardingFragment"
             app:destination="@id/onboardingFragment" />
+        <action
+            android:id="@+id/action_videoFeedFragment_to_vrFragment"
+            app:destination="@id/vrFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/vrFragment"
+        android:name="eu.darken.fpv.dvca.feedplayer.ui.vr.VrPlayerFragment"
+        android:label="VrFragment"
+        tools:layout="@layout/vrplayer_fragment">
+        <action
+            android:id="@+id/action_vrFragment_to_videoFeedFragment"
+            app:destination="@id/videoFeedFragment" />
     </fragment>
 
     <fragment

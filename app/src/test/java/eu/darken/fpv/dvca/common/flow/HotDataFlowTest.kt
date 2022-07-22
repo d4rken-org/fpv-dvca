@@ -25,7 +25,7 @@ class HotDataFlowTest : BaseTest() {
 
     // Without an init value, there isn't a way to keep using the flow
     @Test
-    fun `exceptions on initializen are rethrown`() {
+    fun `exceptions on initialization are rethrown`() {
         val testScope = TestCoroutineScope()
         val hotData = HotDataFlow<String>(
             loggingTag = "tag",
@@ -35,7 +35,7 @@ class HotDataFlowTest : BaseTest() {
         )
         runBlocking {
             withTimeoutOrNull(500) {
-                // This blocking scope get's the init exception as the first caller
+                // This blocking scope gets the init exception as the first caller
                 hotData.data.firstOrNull()
             } shouldBe null
         }
@@ -320,7 +320,7 @@ class HotDataFlowTest : BaseTest() {
         testScope.advanceUntilIdle()
 
         shouldThrow<IOException> {
-            hotData.updateBlocking { throw IOException("Suprise") } shouldBe 0
+            hotData.updateBlocking { throw IOException("Surprise") } shouldBe 0
         }
         hotData.data.first() shouldBe 2
 
@@ -346,7 +346,7 @@ class HotDataFlowTest : BaseTest() {
         val testCollector = hotData.data.test(startOnScope = testScope)
         testScope.advanceUntilIdle()
 
-        hotData.updateAsync { throw IOException("Suprise") }
+        hotData.updateAsync { throw IOException("Surprise") }
 
         testScope.advanceUntilIdle()
 
@@ -356,7 +356,7 @@ class HotDataFlowTest : BaseTest() {
     }
 
     @Test
-    fun `async updates rethrow errors on hotdata scope if no error handler is set`() = runBlocking {
+    fun `async updates rethrow errors on HotDataFlow scope if no error handler is set`() = runBlocking {
         val testScope = TestCoroutineScope()
 
         val hotData = HotDataFlow(
@@ -372,7 +372,7 @@ class HotDataFlowTest : BaseTest() {
         var thrownError: Exception? = null
 
         hotData.updateAsync(
-            onUpdate = { throw IOException("Suprise") },
+            onUpdate = { throw IOException("Surprise") },
             onError = { thrownError = it }
         )
 

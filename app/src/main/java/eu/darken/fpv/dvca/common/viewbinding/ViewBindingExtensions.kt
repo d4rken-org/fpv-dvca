@@ -62,6 +62,19 @@ class ViewBindingProperty<ComponentT : LifecycleOwner, BindingT : ViewBinding>(
             viewBinding = null
         }
 
+        /**
+         * When quickly navigating, a fragment may be created that was never visible to the user.
+         * It's possible that [Fragment.onDestroyView] is called, but [DefaultLifecycleObserver.onDestroy] is not.
+         * This means the ViewBinding will is not be set to `null` and it still holds the previous layout,
+         * instead of the new layout that the Fragment inflated when navigating back to it.
+         */
+        (localRef as? Fragment)?.view?.let {
+            if (it != viewBinding?.root && localRef === thisRef) {
+                Timber.w("Different view for the same fragment, resetting old viewBinding.")
+                viewBinding = null
+            }
+        }
+
         viewBinding?.let {
             // Only accessible from within the same component
             require(localRef === thisRef)

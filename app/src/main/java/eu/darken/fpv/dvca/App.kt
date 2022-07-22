@@ -4,6 +4,7 @@ import android.app.Application
 import com.getkeepsafe.relinker.ReLinker
 import dagger.hilt.android.HiltAndroidApp
 import eu.darken.fpv.dvca.bugreporting.BugReporter
+import eu.darken.fpv.dvca.dvr.core.DvrController
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -11,6 +12,7 @@ import javax.inject.Inject
 class App : Application() {
 
     @Inject lateinit var bugReporter: BugReporter
+    @Inject lateinit var dvrController: DvrController
 
     override fun onCreate() {
         super.onCreate()
@@ -21,6 +23,8 @@ class App : Application() {
             .loadLibrary(this, "bugsnag-plugin-android-anr")
 
         bugReporter.setup()
+
+        dvrController.setup()
 
         Timber.tag(TAG).d("onCreate() done!")
     }

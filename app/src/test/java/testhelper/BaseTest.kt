@@ -19,7 +19,7 @@ open class BaseTest {
         @AfterAll
         fun onTestClassFinished() {
             unmockkAll()
-            Timber.tag(testClassName).v("onTestClassFinished()")
+            Timber.tag(testClassName!!).v("onTestClassFinished()")
             Timber.uprootAll()
         }
     }

@@ -14,57 +14,74 @@
         app:subtitle="@string/feedsettings_subtitle"
         app:title="@string/feedsettings_label" />
 
-    <com.google.android.material.textview.MaterialTextView
-        style="@style/TextAppearance.MaterialComponents.Overline"
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginHorizontal="16dp"
-        android:layout_marginTop="16dp"
-        android:text="Playback"
-        android:textColor="@color/secondary" />
+        android:layout_height="wrap_content">
 
-    <eu.darken.fpv.dvca.common.preference.ui.SwitchPreferenceView
-        android:id="@+id/playback_multiplayer_landscape"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:description="@string/playback_multiplayer_landscape_description"
-        android:icon="@drawable/ic_multiplayer_playback_24"
-        android:title="@string/playback_multiplayer_landscape_label" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
 
-    <com.google.android.material.textview.MaterialTextView
-        style="@style/TextAppearance.MaterialComponents.Overline"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginHorizontal="16dp"
-        android:layout_marginTop="16dp"
-        android:text="USB"
-        android:textColor="@color/secondary" />
+            <com.google.android.material.textview.MaterialTextView
+                style="@style/TextAppearance.MaterialComponents.Overline"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginTop="16dp"
+                android:text="@string/settings_label_player"
+                android:textColor="@color/secondary" />
 
-    <eu.darken.fpv.dvca.common.preference.ui.PreferenceView
-        android:id="@+id/feed_mode_default"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:description="@string/feedmode_description"
-        android:icon="@drawable/ic_baseline_settings_input_svideo_24"
-        android:title="@string/feedmode_label" />
+            <eu.darken.fpv.dvca.common.preference.ui.SwitchPreferenceView
+                android:id="@+id/playback_multiplayer_landscape"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:description="@string/playback_multiplayer_landscape_description"
+                android:icon="@drawable/ic_multiplayer_playback_24"
+                android:title="@string/playback_multiplayer_landscape_label" />
 
-    <com.google.android.material.textview.MaterialTextView
-        style="@style/TextAppearance.MaterialComponents.Overline"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginHorizontal="16dp"
-        android:layout_marginTop="16dp"
-        android:text="DVR"
-        android:textColor="@color/secondary"
-        android:visibility="gone" />
+            <com.google.android.material.textview.MaterialTextView
+                style="@style/TextAppearance.MaterialComponents.Overline"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginTop="16dp"
+                android:text="@string/settings_label_usb"
+                android:textColor="@color/secondary" />
 
-    <eu.darken.fpv.dvca.common.preference.ui.PreferenceView
-        android:id="@+id/dvr_path"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:description="@string/dvr_path_description"
-        android:icon="@drawable/ic_video_file_24"
-        android:title="@string/dvr_path_label"
-        android:visibility="gone" />
+            <eu.darken.fpv.dvca.common.preference.ui.PreferenceView
+                android:id="@+id/feed_mode_default"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:description="@string/feedmode_description"
+                android:icon="@drawable/ic_baseline_settings_input_svideo_24"
+                android:title="@string/feedmode_label" />
 
+            <com.google.android.material.textview.MaterialTextView
+                style="@style/TextAppearance.MaterialComponents.Overline"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginTop="16dp"
+                android:text="@string/settings_label_dvr"
+                android:textColor="@color/secondary" />
+
+            <eu.darken.fpv.dvca.common.preference.ui.PreferenceView
+                android:id="@+id/dvr_path"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:description="@string/dvr_path_description"
+                android:icon="@drawable/ic_video_file_24"
+                android:title="@string/dvr_path_label" />
+
+            <eu.darken.fpv.dvca.common.preference.ui.PreferenceView
+                android:id="@+id/dvr_mode_default"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:description="@string/dvrmode_description"
+                android:icon="@drawable/ic_baseline_video_settings_24"
+                android:title="@string/dvrmode_label" />
+        </LinearLayout>
+
+    </androidx.core.widget.NestedScrollView>
 </LinearLayout>

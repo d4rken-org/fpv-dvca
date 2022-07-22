@@ -21,8 +21,8 @@ import eu.darken.fpv.dvca.common.showSystemUI
 import eu.darken.fpv.dvca.common.smart.SmartFragment
 import eu.darken.fpv.dvca.common.viewbinding.viewBindingLazy
 import eu.darken.fpv.dvca.databinding.VideofeedFragmentBinding
-import eu.darken.fpv.dvca.feedplayer.core.player.exo.ExoFeedPlayer
-import eu.darken.fpv.dvca.feedplayer.core.player.exo.RenderInfo
+import eu.darken.fpv.dvca.feedplayer.core.exo.ExoFeedPlayer
+import eu.darken.fpv.dvca.feedplayer.core.exo.RenderInfo
 import eu.darken.fpv.dvca.gear.goggles.Goggles
 import timber.log.Timber
 import javax.inject.Inject
@@ -55,6 +55,10 @@ class FeedPlayerFragment : SmartFragment(R.layout.videofeed_fragment) {
             toolbar.inflateMenu(R.menu.feedplayer_menu)
             toolbar.setOnMenuItemClickListener {
                 when (it.itemId) {
+                    R.id.vrmode -> {
+                        doNavigate(FeedPlayerFragmentDirections.actionVideoFeedFragmentToVrFragment())
+                        true
+                    }
                     R.id.settings -> {
                         doNavigate(FeedPlayerFragmentDirections.actionVideoFeedFragmentToSettingsFragment())
                         true
@@ -71,16 +75,19 @@ class FeedPlayerFragment : SmartFragment(R.layout.videofeed_fragment) {
                     else -> super.onOptionsItemSelected(it)
                 }
             }
+
+            playerContainer.orientation = when (isInLandscape) {
+                true -> LinearLayout.HORIZONTAL
+                false -> LinearLayout.VERTICAL
+            }
         }
 
         // Player 1
         binding.apply {
             player1Placeholder.text = getString(R.string.video_feed_player_tease, "1")
-            player1RecordFab.setOnClickListener {
-                vm.onPlayer1RecordToggle()
-            }
+            player1DvrRecord.setOnClickListener { vm.onPlayer1RecordToggle() }
 
-            vm.google1Feed.observe2(this@FeedPlayerFragment) { feed ->
+            vm.video1.observe2(this@FeedPlayerFragment) { feed ->
                 Timber.tag(TAG).d("google1Feed.observe2(): %s", feed)
                 if (feed != null) {
                     exoPlayer1.start(
@@ -100,27 +107,34 @@ class FeedPlayerFragment : SmartFragment(R.layout.videofeed_fragment) {
                 player1Placeholder.isGone = feed != null
                 player1Canvas.isInvisible = feed == null
                 player1Metadata.isInvisible = feed == null
-                player1RecordFab.isGone = true // feed == null
+                player1Dvr.isGone = feed == null
+            }
+            vm.dvr1.observe2(this@FeedPlayerFragment) { stats ->
+                player1DvrRecord.setImageResource(
+                    if (stats != null) R.drawable.ic_round_stop_24 else R.drawable.ic_video_file_24
+                )
+                player1DvrInfo.isGone = stats == null
+                player1DvrInfo.text = stats?.let {
+                    val seconds = it.length.inWholeSeconds
+                    String.format("%02dm %02ds", (seconds % 3600) / 60, (seconds % 60))
+                }
             }
         }
 
         // Player 2
         binding.apply {
-            playerContainer.orientation = when (isInLandscape) {
-                true -> LinearLayout.HORIZONTAL
-                false -> LinearLayout.VERTICAL
-            }
             player2Container.isGone = isInLandscape && !vm.isMultiplayerInLandscapeAllowed
-
             player2Placeholder.text = getString(R.string.video_feed_player_tease, "2")
-            player2RecordFab.setOnClickListener {
-                vm.onPlayer2RecordToggle()
+            player2DvrRecord.setOnClickListener { vm.onPlayer2RecordToggle() }
+
+            if (isInLandscape && !vm.isMultiplayerInLandscapeAllowed) {
+                exoPlayer2.stop()
+                return@apply
             }
 
-            vm.google2Feed.observe2(this@FeedPlayerFragment) { feed ->
+            vm.video2.observe2(this@FeedPlayerFragment) { feed ->
                 Timber.tag(TAG).d("google2Feed.observe2(): %s", feed)
-
-                if (!isInLandscape && feed != null) {
+                if (feed != null) {
                     exoPlayer2.start(
                         feed = feed,
                         surfaceView = player2Canvas,
@@ -138,7 +152,17 @@ class FeedPlayerFragment : SmartFragment(R.layout.videofeed_fragment) {
                 player2Placeholder.isGone = feed != null
                 player2Canvas.isInvisible = feed == null
                 player2Metadata.isInvisible = feed == null
-                player2RecordFab.isGone = true //feed == null
+                player2Dvr.isGone = feed == null
+            }
+            vm.dvr2.observe2(this@FeedPlayerFragment) { stats ->
+                player2DvrRecord.setImageResource(
+                    if (stats != null) R.drawable.ic_round_stop_24 else R.drawable.ic_video_file_24
+                )
+                player2DvrInfo.isGone = stats == null
+                player2DvrInfo.text = stats?.let {
+                    val seconds = it.length.inWholeSeconds
+                    String.format("%02dm %02ds", (seconds % 3600) / 60, (seconds % 60))
+                }
             }
         }
 

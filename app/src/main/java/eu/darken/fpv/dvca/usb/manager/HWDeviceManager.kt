@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.map
 import timber.log.Timber
+import java.io.IOException
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -84,7 +85,8 @@ class HWDeviceManager @Inject constructor(
 
     internal suspend fun openDevice(device: HWDevice): HWConnection {
         Timber.tag(TAG).d("Opening a connection to %s", device)
-        val rawConnection = usbManager.openDevice(device.rawDevice)
+        val rawConnection = usbManager.openDevice(device.rawDevice) ?: throw IOException("Failed to open $device")
+
         return HWConnection(
             rawDevice = device.rawDevice,
             rawConnection = rawConnection

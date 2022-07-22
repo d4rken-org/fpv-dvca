@@ -7,8 +7,8 @@ buildscript {
 
             'version'   : [
                     'major': 0,
-                    'minor': 1,
-                    'patch': 4,
+                    'minor': 3,
+                    'patch': 0,
                     'build': 0,
             ],
     ]
@@ -36,7 +36,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:7.0.0'
+        classpath 'com.android.tools.build:gradle:7.0.1'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:${versions.kotlin.core}"
         classpath "com.google.dagger:hilt-android-gradle-plugin:${versions.dagger.core}"
         classpath "androidx.navigation:navigation-safe-args-gradle-plugin:${versions.androidx.navigation}"

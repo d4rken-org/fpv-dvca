@@ -5,73 +5,73 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.qualifiers.ApplicationContext
+import eu.darken.androidstarter.common.logging.d
 import eu.darken.fpv.dvca.App
+import eu.darken.fpv.dvca.common.coroutine.DispatcherProvider
+import eu.darken.fpv.dvca.common.flow.shareLatest
 import eu.darken.fpv.dvca.gear.Gear
-import eu.darken.fpv.dvca.gear.GearManager
 import eu.darken.fpv.dvca.gear.goggles.Goggles
 import eu.darken.fpv.dvca.gear.goggles.VideoFeedSettings
 import eu.darken.fpv.dvca.usb.HWDevice
 import eu.darken.fpv.dvca.usb.connection.HWConnection
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.*
 import timber.log.Timber
 import java.time.Instant
 
 class FpvGogglesV1 @AssistedInject constructor(
     @Assisted override val device: HWDevice,
     @ApplicationContext private val context: Context,
-    private val gearManager: GearManager,
     private val videoFeedSettings: VideoFeedSettings,
+    dispatcherProvider: DispatcherProvider,
 ) : Goggles {
 
+    override val gearScope = CoroutineScope(SupervisorJob() + dispatcherProvider.IO)
     override val firstSeenAt: Instant = Instant.now()
-
-    private val eventsInternal = MutableStateFlow<Gear.Event?>(null)
-    override val events: Flow<Gear.Event>
-        get() = eventsInternal.filterNotNull()
 
     private var wasVideoActive: Boolean = false
 
-    private var videoFeedInternal: Goggles.VideoFeed? = null
-    override val videoFeed: Goggles.VideoFeed?
-        get() = videoFeedInternal
-
-    private var connection: HWConnection? = null
-
-    override suspend fun startVideoFeed(): Goggles.VideoFeed {
-        Timber.tag(TAG).i("startVideoFeed()")
-        videoFeedInternal?.let {
-            Timber.tag(TAG).w("Feed is already active!")
-            return it
-        }
-
-        connection = device.openConnection()
-
-        return FpvGogglesV1VideoFeed(
-            context,
-            connection!!,
-            usbReadMode = videoFeedSettings.feedModeDefault.value,
-        ).also { feed ->
-            videoFeedInternal = feed
+    val connection: Flow<HWConnection> = callbackFlow {
+        Timber.tag(TAG).i("Opening device connection for %s", device)
+        val connection = device.openConnection()
+        send(connection)
+        awaitClose {
+            Timber.tag(TAG).i("Closing device connection for %s", device)
+            connection.close()
         }
     }
+        .onCompletion { d(TAG) { "onCompletion(): Connect completed for $this: $it" } }
+        .shareLatest(scope = gearScope, started = SharingStarted.WhileSubscribed(replayExpirationMillis = 3000))
 
-    override suspend fun stopVideoFeed() {
-        Timber.tag(TAG).i("stopVideoFeed()")
-        videoFeedInternal?.let {
-            it.close()
-            wasVideoActive = false
+    override val videoFeed: Flow<Goggles.VideoFeed> = connection
+        .flatMapLatest { connection ->
+            Timber.tag(TAG).i("Creating videofeed on %s", connection)
+            callbackFlow<Goggles.VideoFeed> {
+                val feed = FpvGogglesV1VideoFeed(
+                    connection,
+                    usbReadMode = videoFeedSettings.feedModeDefault.value,
+                )
+                feed.open()
+
+                send(feed)
+
+                awaitClose {
+                    Timber.tag(TAG).i("Closing video feed on %s", connection)
+                    feed.close()
+
+                    wasVideoActive = false
+                }
+            }
         }
-        videoFeedInternal = null
-
-        connection?.close()
-        connection = null
-    }
+        .onCompletion { d(TAG) { "onCompletion(): Video feed completed for $this: $it" } }
+        .shareLatest(scope = gearScope, started = SharingStarted.WhileSubscribed(replayExpirationMillis = 3000))
 
     override suspend fun release() {
         Timber.tag(TAG).d("release()")
-        stopVideoFeed()
+        gearScope.cancel("release() was called")
     }
 
     override fun toString(): String = device.logId
