@@ -1,4 +1,5 @@
 # FPV DVCA 
+[![GitHub release (latest SemVer including pre-releases)](https://img.shields.io/github/v/release/d4rken-org/fpv-dvca?include_prereleases)](https://github.com/d4rken-org/fpv-dvca/releases/latest)
 ![Build](https://github.com/d4rken/fpv-dvca/actions/workflows/android.yml/badge.svg)
 [![Github All Releases](https://img.shields.io/github/downloads/d4rken/fpv-dvca/total.svg)](https://github.com/d4rken/fpv-dvca/releases/latest)
 
