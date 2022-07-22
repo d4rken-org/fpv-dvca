@@ -32,16 +32,20 @@ android {
     signingConfigs {
         release {}
     }
+    Properties signingProps = new Properties()
     def signingPropFile = new File(System.properties['user.home'], ".appconfig/${packageName}/signing.properties")
     if (signingPropFile.canRead()) {
-        Properties signingProps = new Properties()
         signingProps.load(new FileInputStream(signingPropFile))
+    }
+    String keyStorePath = System.getenv("STORE_PATH") ?: signingProps["release.storePath"]
+    File keyStore = keyStorePath ? new File(keyStorePath) : null
+    if (keyStore?.canRead()) {
         signingConfigs {
             release {
-                storeFile new File(signingProps['release.storePath'])
-                keyAlias signingProps['release.keyAlias']
-                storePassword signingProps['release.storePassword']
-                keyPassword signingProps['release.keyPassword']
+                storeFile keyStore
+                storePassword  System.getenv("STORE_PASSWORD") ?: signingProps['release.storePassword']
+                keyAlias System.getenv("KEY_ALIAS") ?: signingProps['release.keyAlias']
+                keyPassword  System.getenv("KEY_PASSWORD") ?: signingProps['release.keyPassword']
             }
         }
     }
